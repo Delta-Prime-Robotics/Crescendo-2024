@@ -37,12 +37,8 @@ public class InOut extends SubsystemBase {
     return bbInput.get();
   }
 
-
-
-
   @Override
   public void periodic() {
-    SmartDashboard.getBoolean("BB Boolean2", InOut.getBB());
     // This method will be called once per scheduler run
   }
 }

@@ -141,7 +141,9 @@ public final class Constants {
   }
 
   public final class InOutConstants {
-
+    public static final int kIntakeCanId = 5;
+    public static final int kBottomOutputCanId = 6;
+    public static final int kTopOutputCanId = 7;
   }
 
   /*Usb port Constants for Laptop */
