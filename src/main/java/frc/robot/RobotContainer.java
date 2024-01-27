@@ -50,6 +50,7 @@ public class RobotContainer {
     configureButtonBindings();
 
     // Configure default commands
+    mDashboard.register();
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.

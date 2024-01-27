@@ -17,9 +17,7 @@ import frc.robot.subsystems.DriveSubsystem;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  
   private RobotContainer m_robotContainer;
-  //private Dashboard mDashboard;
 
   /**
    * This function is run when the robot is first started up and should be used for any
