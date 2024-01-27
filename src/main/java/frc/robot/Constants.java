@@ -139,4 +139,41 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
+
+  public final class InOutConstants {
+
+  }
+
+  /*Usb port Constants for Laptop */
+  public final class UsbPort {
+    public static final int kGamePadO = 2;
+    public static final int kGamePadDr = 3;
+    // public static final int kFlightJoystick = 3;
+  }
+  
+  /** Constants for the gamepad joysticks & buttons */ 
+  public static final class GamePad {
+    // Joysticks and their axes
+    public final class LeftStick {
+        public static final int kLeftRight = 0;
+        public static final int kUpDown = 1;
+    }
+    public final class RightStick {
+        public static final int kLeftRight = 2;
+        public static final int kUpDown = 3;
+    }
+
+    public final class Button {
+        public static final int kX = 1;
+        public static final int kA = 2;
+        public static final int kB = 3;
+        public static final int kY = 4;
+        public static final int kLB = 5;
+        public static final int kRB = 6;
+        public static final int kLT = 7;
+        public static final int kRT = 8;
+        /* kBack = 9; kStart = 10 */
+        /* Joystick click: kLeftStick = 11, kRightStick = 12 */
+    } 
+  }
 }
