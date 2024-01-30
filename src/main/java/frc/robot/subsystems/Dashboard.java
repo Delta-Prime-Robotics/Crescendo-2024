@@ -4,32 +4,26 @@
 
 package frc.robot.subsystems;
 
-import frc.robot.subsystems.Sensors;
-
-import com.kauailabs.navx.frc.AHRS;
-
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.shuffleboard.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Dashboard extends SubsystemBase {
-  DriveSubsystem m_DriveSubsystem;
-  
-  
- 
+  private static InOut m_InOut;
+  private DriveSubsystem m_Drive;
+
   /** Creates a new Shuffleboard. */
-  public Dashboard(DriveSubsystem aDrive) {
-    m_DriveSubsystem = aDrive;
+  public Dashboard(DriveSubsystem driveSubsystem, InOut inOutSubsystem) {
+    m_Drive = driveSubsystem;
+    m_InOut = inOutSubsystem;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Get yaw value", Sensors.m_navx.getAngle());
-    SmartDashboard.putNumber("Get Heading", m_DriveSubsystem.getHeading());
-    SmartDashboard.putBoolean("BB Boolean", InOut.getBB());
+    SmartDashboard.putNumber("Get Heading", m_Drive.getHeading());
+    SmartDashboard.putBoolean("Note In Intake", m_InOut.isNoteInIntake().getAsBoolean());
   }
 
   protected void execute() {

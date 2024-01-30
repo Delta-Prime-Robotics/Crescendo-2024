@@ -141,9 +141,14 @@ public final class Constants {
   }
 
   public final class InOutConstants {
+    //CanID
     public static final int kIntakeCanId = 5;
     public static final int kBottomOutputCanId = 6;
     public static final int kTopOutputCanId = 7;
+
+    // Idle modes
+    public static final IdleMode kShooterIdleMode = IdleMode.kCoast;
+    public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;
   }
 
   /*Usb port Constants for Laptop */
