@@ -25,7 +25,7 @@ public class IntakeCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // new SequentialCommandGroup(
+    //will the setIntake finish the ParallelDeadlineGroup before the WaitUntilCommand?    // new SequentialCommandGroup(
     // new ParallelDeadlineGroup(
     //   new WaitUntilCommand(m_InOut.isNoteInIntake()),
     //   new RunCommand(() -> m_InOut.setIntake(0.75), m_InOut)
