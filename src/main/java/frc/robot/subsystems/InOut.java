@@ -4,24 +4,33 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import java.util.function.BooleanSupplier;
 
 import frc.robot.Constants.InOutConstants;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
 public class InOut extends SubsystemBase {
   //Output Top & Bottom 
-  private final CANSparkMax m_bottomSparkMax;
-  private final CANSparkMax m_topSparkMax;
+  private final CANSparkMax m_FollowerShooter;
+  private final CANSparkMax m_LeaderShooter;
   private final CANSparkMax m_intakeSparkMax;
 
   // Create a new SimpleMotorFeedforward with gains kS, kV, and kA
   static SimpleMotorFeedforward feedforwardShooter = new SimpleMotorFeedforward(0, 0, 0);
-  //static PIDController shooterPID = new PIDController(0, 0, 0);
+  //static PIDController shooterPID = new PIDController(1,0, 1);//keep ki as zero or as best you can
   
   //IR Beam Break
   public static DigitalInput bbInput = new DigitalInput(0);
@@ -29,17 +38,17 @@ public class InOut extends SubsystemBase {
   /** Creates a new InOut. */
   public InOut() {
     //setting CAN ID's for Shooter Motor Controlers
-    m_bottomSparkMax = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);
-    m_topSparkMax = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);
-    m_topSparkMax.follow(m_bottomSparkMax);
+    m_FollowerShooter = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);//Bottom
+    m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
+    m_LeaderShooter.follow(m_FollowerShooter);
     
     //invert
-    m_topSparkMax.setInverted(true);
-    m_bottomSparkMax.setInverted(true);
+    m_LeaderShooter.setInverted(true);
+    m_FollowerShooter.setInverted(true);
 
     //seting idle to coast
-    m_bottomSparkMax.setIdleMode(InOutConstants.kShooterIdleMode);
-    m_topSparkMax.setIdleMode(InOutConstants.kShooterIdleMode);
+    m_FollowerShooter.setIdleMode(InOutConstants.kShooterIdleMode);
+    m_LeaderShooter.setIdleMode(InOutConstants.kShooterIdleMode);
 
     //setting CAN ID's for Intake Motor Controler
     m_intakeSparkMax = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
@@ -48,6 +57,8 @@ public class InOut extends SubsystemBase {
     m_intakeSparkMax.setIdleMode(InOutConstants.kIntakeIdleMode);
   }
 
+
+  //Note detector
   public BooleanSupplier isNoteInIntake() {
     //when the BeamBreak is false there is a note in the Intake
     if (bbInput.get() == false) {
@@ -57,26 +68,59 @@ public class InOut extends SubsystemBase {
     return () -> false;
     }
   }
-  
-  public static Boolean getBBstate() {
-    return bbInput.get();
+
+
+  //Beam Break will return true when there is no Note
+  public BooleanSupplier isNoteOutOfIntake() {
+    return () -> bbInput.get();
   }
 
-  public void setShooter(double velocity, double accel ){
-    m_topSparkMax.setVoltage(feedforwardShooter.calculate(velocity, accel));
-  }
-
-  public void setIntake(double speed){
+  //checks if speed is greater than 1 or -1
+  //returns either a abs or unchange vaulef
+  public double speedCheck(double speed, Boolean abs) {
     double absSpeed = Math.abs(speed);
-    //checks if speed is greater than 1 or -1
+    double result = 0;
     if (1 < absSpeed){
-    m_intakeSparkMax.set(absSpeed);
+      result = abs ? absSpeed : speed; //I forgot why I added this 
     }
-    else {
-    m_intakeSparkMax.set(0);
-    }
+    return result;
   }
 
+
+  //Shooter set speed
+  public void setShooter(double speed){
+    speed = speedCheck(speed, false);
+    m_LeaderShooter.set(speed);
+  }
+  
+  //work in progress
+  public void setShooterPID(double velocity, double accel ){
+    m_LeaderShooter.setVoltage(feedforwardShooter.calculate(velocity, accel));
+  }
+ 
+
+  // intake only needs to forwards so the speed will always be positive
+  public void setIntake(double speed){
+    speed = speedCheck(speed, true);
+    m_intakeSparkMax.set(speed);
+  }
+
+  public InstantCommand intakeStop(){
+    return new InstantCommand(() -> m_intakeSparkMax.set(0));
+  }
+
+
+  public Command intoShooter(){
+    return new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+        new WaitUntilCommand(isNoteOutOfIntake()),
+        new RunCommand(() -> setIntake(0.1))
+      )
+      .andThen(intakeStop())
+    );
+  }
+
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
