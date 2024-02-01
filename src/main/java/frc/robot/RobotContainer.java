@@ -22,8 +22,9 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.Dashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.InOut;
-//import frc.robot.subsystems.InOut;
+import frc.robot.commands.*;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -43,6 +44,8 @@ public class RobotContainer {
   
   // The driver's controller
   private final Joystick m_driverGamepad = new Joystick(Constants.UsbPort.kGamePadDr);
+  //The Operator's controller
+  private final Joystick m_operatorGamepad = new Joystick(Constants.UsbPort.kGamePadO);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -80,6 +83,16 @@ public class RobotContainer {
         .toggleOnTrue(new RunCommand(
             () -> m_robotDrive.setX(),
             m_robotDrive));
+    
+    //Intake Comand
+    new JoystickButton(m_driverGamepad, Constants.GamePad.Button.kA)
+    .onTrue(new RunCommand(() -> m_InOut.intakeNote(0.5), m_InOut))
+    .onFalse(new InstantCommand(() -> m_InOut.intakeNote(0), m_InOut));
+    
+    //Shooter Comand
+    new JoystickButton(m_driverGamepad, Constants.GamePad.Button.kB)
+    .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
+    .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
   }
 
   /**
@@ -88,6 +101,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    
     // Create config for trajectory
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,

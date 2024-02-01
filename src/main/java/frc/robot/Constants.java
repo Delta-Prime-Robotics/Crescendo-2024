@@ -145,7 +145,9 @@ public final class Constants {
     public static final int kIntakeCanId = 5;
     public static final int kBottomOutputCanId = 6;
     public static final int kTopOutputCanId = 7;
-
+    //smart Current Limits
+    public static final int kNeo550SetCurrent = 30;
+    public static final int kNeoSetCurrent = 50;
     // Idle modes
     public static final IdleMode kShooterIdleMode = IdleMode.kCoast;
     public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;

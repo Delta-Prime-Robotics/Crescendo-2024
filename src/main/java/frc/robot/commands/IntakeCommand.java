@@ -32,23 +32,22 @@ public class IntakeCommand extends Command {
     // )
     // .andThen(() -> m_InOut.setIntake(0))
     // );
-
-    new ParallelDeadlineGroup(
-      new WaitUntilCommand(m_InOut.isNoteInIntake()),
-      new RunCommand(() -> m_InOut.setIntake(0.75), m_InOut));
    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+      //m_InOut.setIntake(0.75);
   }
   
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_InOut.setIntake(0);
+
+    //m_InOut.setIntake(0);
+
   }
 
   // Returns true when the command should end.

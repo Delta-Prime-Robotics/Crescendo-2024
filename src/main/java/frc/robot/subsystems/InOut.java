@@ -18,6 +18,7 @@ import com.revrobotics.CANSparkMax;
 
 import java.util.function.BooleanSupplier;
 
+import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -40,7 +41,7 @@ public class InOut extends SubsystemBase {
     //setting CAN ID's for Shooter Motor Controlers
     m_FollowerShooter = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);//Bottom
     m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
-    m_LeaderShooter.follow(m_FollowerShooter);
+    //m_FollowerShooter.follow(m_LeaderShooter);
     
     //invert
     m_LeaderShooter.setInverted(true);
@@ -52,9 +53,8 @@ public class InOut extends SubsystemBase {
 
     //setting CAN ID's for Intake Motor Controler
     m_intakeSparkMax = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
-    
-    //setting idle to break
     m_intakeSparkMax.setIdleMode(InOutConstants.kIntakeIdleMode);
+    m_intakeSparkMax.setSmartCurrentLimit(InOutConstants.kNeo550SetCurrent);
   }
 
 
@@ -68,7 +68,6 @@ public class InOut extends SubsystemBase {
     return () -> false;
     }
   }
-
 
   //Beam Break will return true when there is no Note
   public BooleanSupplier isNoteOutOfIntake() {
@@ -86,11 +85,13 @@ public class InOut extends SubsystemBase {
     return result;
   }
 
-
+  public static boolean m_Hitting = false;
   //Shooter set speed
   public void setShooter(double speed){
-    speed = speedCheck(speed, false);
+    //speed = speedCheck(speed, false);
     m_LeaderShooter.set(speed);
+    m_FollowerShooter.set(speed);
+    m_Hitting = !m_Hitting;
   }
   
   //work in progress
@@ -100,9 +101,14 @@ public class InOut extends SubsystemBase {
  
 
   // intake only needs to forwards so the speed will always be positive
-  public void setIntake(double speed){
-    speed = speedCheck(speed, true);
-    m_intakeSparkMax.set(speed);
+  public void intakeNote(double speed){
+    if (isNoteInIntake().getAsBoolean()) {
+      m_intakeSparkMax.set(0);
+    }
+    else{
+      m_intakeSparkMax.set(speed);
+    }
+    //speed = speedCheck(speed, true);
   }
 
   public InstantCommand intakeStop(){
@@ -114,7 +120,7 @@ public class InOut extends SubsystemBase {
     return new SequentialCommandGroup(
       new ParallelDeadlineGroup(
         new WaitUntilCommand(isNoteOutOfIntake()),
-        new RunCommand(() -> setIntake(0.1))
+        new RunCommand(() -> intakeNote(0.1))
       )
       .andThen(intakeStop())
     );
