@@ -17,8 +17,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.GamePad;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Dashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.InOut;
@@ -30,6 +32,8 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.introspect.ConcreteBeanPropertyBase;
+
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -40,7 +44,10 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem(); 
   private final InOut m_InOut = new InOut();
-  private final Dashboard m_Dashboard = new Dashboard(m_robotDrive, m_InOut);
+  private final ArmSubsystem m_Arm = new ArmSubsystem();
+  private final Dashboard m_Dashboard = new Dashboard(m_robotDrive, m_InOut, m_Arm);
+  
+
   
   // The driver's controller
   private final Joystick m_driverGamepad = new Joystick(Constants.UsbPort.kGamePadDr);
@@ -85,14 +92,22 @@ public class RobotContainer {
             m_robotDrive));
     
     //Intake Comand
-    new JoystickButton(m_driverGamepad, Constants.GamePad.Button.kA)
-    .onTrue(new RunCommand(() -> m_InOut.intakeNote(0.5), m_InOut))
+    new JoystickButton(m_operatorGamepad, Constants.GamePad.Button.kA)
+    .onTrue(new RunCommand(() -> m_InOut.intakeNote(1), m_InOut))
     .onFalse(new InstantCommand(() -> m_InOut.intakeNote(0), m_InOut));
     
     //Shooter Comand
-    new JoystickButton(m_driverGamepad, Constants.GamePad.Button.kB)
+    new JoystickButton(m_operatorGamepad, Constants.GamePad.Button.kB)
     .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
     .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
+
+    new JoystickButton(m_operatorGamepad,Constants.GamePad.Button.k);
+
+    //arm command
+    new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
+    .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
+    .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
+
   }
 
   /**

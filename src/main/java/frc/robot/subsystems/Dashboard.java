@@ -11,11 +11,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Dashboard extends SubsystemBase {
   private static InOut m_InOut;
   private DriveSubsystem m_Drive;
+  private ArmSubsystem m_Arm;
 
   /** Creates a new Shuffleboard. */
-  public Dashboard(DriveSubsystem driveSubsystem, InOut inOutSubsystem) {
+  public Dashboard(DriveSubsystem driveSubsystem, InOut inOutSubsystem, ArmSubsystem armSubsystem) {
     m_Drive = driveSubsystem;
     m_InOut = inOutSubsystem;
+    m_Arm = armSubsystem;
+
   }
 
   @Override
@@ -25,6 +28,7 @@ public class Dashboard extends SubsystemBase {
     SmartDashboard.putNumber("Get Heading", m_Drive.getHeading());
     SmartDashboard.putBoolean("Note In Intake", m_InOut.bbInput.get());
     SmartDashboard.putBoolean("Hitting", m_InOut.m_Hitting);
+    SmartDashboard.putNumber("Arm Encoder", m_Arm.getEncoder());
   }
 
   protected void execute() {

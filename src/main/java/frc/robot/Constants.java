@@ -138,6 +138,9 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+    //smart Current Limits
+    public static final int kNeo550SetCurrent = 30;
+    public static final int kNeoSetCurrent = 50;
   }
 
   public final class InOutConstants {
@@ -145,12 +148,22 @@ public final class Constants {
     public static final int kIntakeCanId = 5;
     public static final int kBottomOutputCanId = 6;
     public static final int kTopOutputCanId = 7;
-    //smart Current Limits
-    public static final int kNeo550SetCurrent = 30;
-    public static final int kNeoSetCurrent = 50;
+    //Beam Break DIO
+    public static final int kBeamBreakDIO = 0;
     // Idle modes
     public static final IdleMode kShooterIdleMode = IdleMode.kCoast;
     public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;
+  }
+
+  public final class ArmConstants {
+    //CanID
+    public static final int kArmLeftCanId = 8;
+    public static final int kArmRightCanId = 9;
+    //DIO
+    public static final int kArmEncoderDIO = 1;
+    //Idle Mode
+    public static final IdleMode kArmIdleMode = IdleMode.kBrake;
+   
   }
 
   /*Usb port Constants for Laptop */

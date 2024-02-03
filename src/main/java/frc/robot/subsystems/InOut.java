@@ -20,6 +20,7 @@ import java.util.function.BooleanSupplier;
 
 import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
+import frc.robot.Constants.NeoMotorConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -34,7 +35,7 @@ public class InOut extends SubsystemBase {
   //static PIDController shooterPID = new PIDController(1,0, 1);//keep ki as zero or as best you can
   
   //IR Beam Break
-  public static DigitalInput bbInput = new DigitalInput(0);
+  public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
 
   /** Creates a new InOut. */
   public InOut() {
@@ -43,10 +44,10 @@ public class InOut extends SubsystemBase {
     m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
     m_FollowerShooter.follow(m_LeaderShooter);
     
-    //invert
-    // m_LeaderShooter.setInverted(true);
-    // m_FollowerShooter.setInverted(true);
-
+    //Set Current Limit
+    m_FollowerShooter.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
+    m_LeaderShooter.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
+ 
     //seting idle to coast
     m_FollowerShooter.setIdleMode(InOutConstants.kShooterIdleMode);
     m_LeaderShooter.setIdleMode(InOutConstants.kShooterIdleMode);
@@ -55,7 +56,7 @@ public class InOut extends SubsystemBase {
     //setting CAN ID's for Intake Motor Controler
     m_intakeSparkMax = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
     m_intakeSparkMax.setIdleMode(InOutConstants.kIntakeIdleMode);
-    m_intakeSparkMax.setSmartCurrentLimit(InOutConstants.kNeo550SetCurrent);
+    m_intakeSparkMax.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
   }
 
 
