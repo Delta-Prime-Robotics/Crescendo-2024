@@ -41,15 +41,16 @@ public class InOut extends SubsystemBase {
     //setting CAN ID's for Shooter Motor Controlers
     m_FollowerShooter = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);//Bottom
     m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
-    //m_FollowerShooter.follow(m_LeaderShooter);
+    m_FollowerShooter.follow(m_LeaderShooter);
     
     //invert
-    m_LeaderShooter.setInverted(true);
-    m_FollowerShooter.setInverted(true);
+    // m_LeaderShooter.setInverted(true);
+    // m_FollowerShooter.setInverted(true);
 
     //seting idle to coast
     m_FollowerShooter.setIdleMode(InOutConstants.kShooterIdleMode);
     m_LeaderShooter.setIdleMode(InOutConstants.kShooterIdleMode);
+
 
     //setting CAN ID's for Intake Motor Controler
     m_intakeSparkMax = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
@@ -90,7 +91,7 @@ public class InOut extends SubsystemBase {
   public void setShooter(double speed){
     //speed = speedCheck(speed, false);
     m_LeaderShooter.set(speed);
-    m_FollowerShooter.set(speed);
+    //m_FollowerShooter.set(speed);
     m_Hitting = !m_Hitting;
   }
   
