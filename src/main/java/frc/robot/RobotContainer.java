@@ -19,7 +19,6 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.GamePad;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.IntakeCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Dashboard;
 import frc.robot.subsystems.DriveSubsystem;
@@ -64,20 +63,35 @@ public class RobotContainer {
     
     // Configure the button bindings
     configureButtonBindings();
-
-    // Configure default commands
+    configureDefaultCommands();
+    
     m_Dashboard.register();
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-       new RunCommand(
-            () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.LeftStick.kUpDown), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.LeftStick.kLeftRight), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.RightStick.kLeftRight), OIConstants.kDriveDeadband),
-                true, true),
-            m_robotDrive));
+    
   }
+  // Configure default commands
+  private void configureDefaultCommands() {
+    m_robotDrive.setDefaultCommand(
+    // The left stick controls translation of the robot.
+    // Turning is controlled by the X axis of the right stick.
+   new RunCommand(
+        () -> m_robotDrive.drive(
+            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.LeftStick.kUpDown), OIConstants.kDriveDeadband),
+            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.LeftStick.kLeftRight), OIConstants.kDriveDeadband),
+            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.RightStick.kLeftRight), OIConstants.kDriveDeadband),
+            true, true),
+        m_robotDrive));
+
+    if (m_Arm != null && m_operatorGamepad != null) {
+      m_Arm.setDefaultCommand(new ArmMoveCommand(m_Arm, 
+      () -> -m_operatorGamepad.getRawAxis(GamePad.LeftStick.kUpDown) 
+      ));
+    }
+
+
+  }
+
+
+
 
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -94,28 +108,29 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
     
-    // //Intake Comand
-    // Trigger intakeMaunalOveride = new JoystickButton(m_operatorGamepad,GamePad.Button.kY);
+    //Intake Comand
+    Trigger intakeMaunalOveride = new JoystickButton(m_operatorGamepad,GamePad.Button.kY);
 
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kA)
-    // .onTrue(new RunCommand(() -> m_InOut.intakeNote(1, intakeMaunalOveride.getAsBoolean()), m_InOut))
-    // .onFalse(new InstantCommand(() -> m_InOut.intakeNote(0,true), m_InOut));
+    new JoystickButton(m_operatorGamepad, GamePad.Button.kA)
+    .onTrue(new RunCommand(() -> m_InOut.intakeNote(1, intakeMaunalOveride.getAsBoolean()), m_InOut))
+    .onFalse(new InstantCommand(() -> m_InOut.intakeNote(0,true), m_InOut));
 
-    // //Shooter Comand
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
-    // .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
-    // .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
+    //Shooter Comand
+    new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
+    .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
+    .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
 
-    // new JoystickButton(m_operatorGamepad,GamePad.Button.kY);
-    // //arm command
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
-    // .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
-    // .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
+    new JoystickButton(m_operatorGamepad,GamePad.Button.kY);
+    
+    //arm command
+    new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
+    .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
+    .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
 
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kA).whileTrue(m_InOut.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kY).whileTrue(m_InOut.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kX).whileTrue(m_InOut.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kB).whileTrue(m_InOut.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // new JoystickButton(m_operatorGamepad, GamePad.Button.kA).whileTrue(m_InOut.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // new JoystickButton(m_operatorGamepad, GamePad.Button.kY).whileTrue(m_InOut.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // new JoystickButton(m_operatorGamepad, GamePad.Button.kX).whileTrue(m_InOut.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // new JoystickButton(m_operatorGamepad, GamePad.Button.kB).whileTrue(m_InOut.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 
   /**
