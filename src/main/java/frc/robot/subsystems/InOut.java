@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -23,6 +24,8 @@ import frc.robot.Constants.InOutConstants;
 import frc.robot.Constants.NeoMotorConstants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 public class InOut extends SubsystemBase {
   //Output Top & Bottom 
@@ -43,7 +46,7 @@ public class InOut extends SubsystemBase {
     m_FollowerShooter = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);//Bottom
     m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
     m_FollowerShooter.follow(m_LeaderShooter);
-    
+
     //Set Current Limit
     m_FollowerShooter.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
     m_LeaderShooter.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
@@ -57,8 +60,26 @@ public class InOut extends SubsystemBase {
     m_intakeSparkMax = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
     m_intakeSparkMax.setIdleMode(InOutConstants.kIntakeIdleMode);
     m_intakeSparkMax.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
+
+    mSysIdRoutine = new SysIdRoutine(
+      new SysIdRoutine.Config(), 
+      new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+                m_LeaderShooter.setVoltage(volts.magnitude());
+                m_FollowerShooter.setVoltage(volts.magnitude());
+              },
+    null, // No log consumer, since data is recorded by URCL
+    this
+  ));
+
   }
 
+  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return mSysIdRoutine.quasistatic(direction);
+  }
+
+  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return mSysIdRoutine.dynamic(direction);
+  }
 
   //Note detector
   public BooleanSupplier isNoteInIntake() {
@@ -103,8 +124,11 @@ public class InOut extends SubsystemBase {
  
 
   // intake only needs to forwards so the speed will always be positive
-  public void intakeNote(double speed){
-    if (isNoteInIntake().getAsBoolean()) {
+  public void intakeNote(double speed, boolean maunalOveride){
+    if (maunalOveride){
+      m_intakeSparkMax.set(speed);
+    }
+    else if (isNoteInIntake().getAsBoolean()) {
       m_intakeSparkMax.set(0);
     }
     else{
@@ -117,17 +141,12 @@ public class InOut extends SubsystemBase {
     return new InstantCommand(() -> m_intakeSparkMax.set(0));
   }
 
-
   public Command intoShooter(){
-    return new SequentialCommandGroup(
-      new ParallelDeadlineGroup(
-        new WaitUntilCommand(isNoteOutOfIntake()),
-        new RunCommand(() -> intakeNote(0.1))
-      )
-      .andThen(intakeStop())
-    );
+
+    return null;
   }
 
+  private SysIdRoutine mSysIdRoutine;  
   
   @Override
   public void periodic() {
