@@ -9,15 +9,17 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.InOut;
 
 public class IntakeCommand extends Command {
   private static InOut m_InOut;
-
+  private boolean m_maunalOveride;
   /** Creates a new IntakeCommand. */
-  public IntakeCommand(InOut inOutSubsystem) {
+  public IntakeCommand(InOut inOutSubsystem, Trigger trigger) {
     m_InOut = inOutSubsystem;
-    
+    m_maunalOveride = trigger.getAsBoolean();
+
     addRequirements(m_InOut);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -25,28 +27,18 @@ public class IntakeCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //will the setIntake finish the ParallelDeadlineGroup before the WaitUntilCommand?    // new SequentialCommandGroup(
-    // new ParallelDeadlineGroup(
-    //   new WaitUntilCommand(m_InOut.isNoteInIntake()),
-    //   new RunCommand(() -> m_InOut.setIntake(0.75), m_InOut)
-    // )
-    // .andThen(() -> m_InOut.setIntake(0))
-    // );
-   
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      //m_InOut.setIntake(0.75);
+      new RunCommand(() -> m_InOut.intakeNote(0.75, m_maunalOveride));
   }
   
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-
-    //m_InOut.setIntake(0);
 
   }
 

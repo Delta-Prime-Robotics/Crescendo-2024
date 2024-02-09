@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -117,13 +118,17 @@ public class InOut extends SubsystemBase {
     m_Hitting = !m_Hitting;
   }
   
+
   //work in progress
   public void setShooterPID(double velocity, double accel ){
     m_LeaderShooter.setVoltage(feedforwardShooter.calculate(velocity, accel));
   }
+
+  public void ampOrSpeaker(double position) {
+    
+  }
  
 
-  // intake only needs to forwards so the speed will always be positive
   public void intakeNote(double speed, boolean maunalOveride){
     if (maunalOveride){
       m_intakeSparkMax.set(speed);
