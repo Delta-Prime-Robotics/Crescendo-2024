@@ -80,7 +80,8 @@ public class RobotContainer {
             -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.RightStick.kLeftRight), OIConstants.kDriveDeadband),
             true, true),
         m_robotDrive));
-
+    
+    //Manual Arm
     if (m_Arm != null && m_operatorGamepad != null) {
       m_Arm.setDefaultCommand(new ArmMoveCommand(m_Arm, 
       () -> -m_operatorGamepad.getRawAxis(GamePad.LeftStick.kUpDown) 
@@ -119,8 +120,6 @@ public class RobotContainer {
     new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
     .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
     .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
-
-    new JoystickButton(m_operatorGamepad,GamePad.Button.kY);
     
     //arm command
     new JoystickButton(m_operatorGamepad, GamePad.Button.kX)

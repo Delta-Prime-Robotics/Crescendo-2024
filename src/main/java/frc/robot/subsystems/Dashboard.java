@@ -28,7 +28,7 @@ public class Dashboard extends SubsystemBase {
     SmartDashboard.putNumber("Get Heading", m_Drive.getHeading());
     SmartDashboard.putBoolean("Note In Intake", m_InOut.bbInput.get());
     SmartDashboard.putBoolean("Hitting", m_InOut.m_Hitting);
-    SmartDashboard.putNumber("Arm Encoder", m_Arm.getEncoder());
+
   }
 
   protected void execute() {
