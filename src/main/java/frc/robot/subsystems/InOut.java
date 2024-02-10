@@ -6,33 +6,39 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import java.util.function.BooleanSupplier;
-
+import static edu.wpi.first.units.MutableMeasure.mutable;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Velocity;
+import edu.wpi.first.units.Voltage;
 import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
 import frc.robot.Constants.NeoMotorConstants;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 public class InOut extends SubsystemBase {
   //Output Top & Bottom 
   private final CANSparkMax m_FollowerShooter;
   private final CANSparkMax m_LeaderShooter;
   private final CANSparkMax m_intakeSparkMax;
+  
+  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
+  private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
+
+  public double m_rate = 0.0;
+  public double m_Volatage = 0.0;
 
   // Create a new SimpleMotorFeedforward with gains kS, kV, and kA
   static SimpleMotorFeedforward feedforwardShooter = new SimpleMotorFeedforward(0, 0, 0);
@@ -65,11 +71,21 @@ public class InOut extends SubsystemBase {
     mSysIdRoutine = new SysIdRoutine(
       new SysIdRoutine.Config(), 
       new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-                m_LeaderShooter.setVoltage(volts.magnitude());
-                m_FollowerShooter.setVoltage(volts.magnitude());
-              },
-    null, // No log consumer, since data is recorded by URCL
-    this
+            m_LeaderShooter.setVoltage(volts.in(Volts));
+            m_rate = m_LeaderShooter.getEncoder().getVelocity();
+            m_Volatage = m_LeaderShooter.getOutputCurrent();
+      },
+          null,
+          this
+          
+          // log -> {
+          //   log.motor("shooter")
+          //   .voltage(
+          //     m_appliedVoltage.mut_replace(
+          //     m_LeaderShooter.get() * RobotController.getBatteryVoltage(), Volts))
+          //   .linearVelocity(
+          //     m_velocity.mut_replace(m_LeaderShooter.getEncoder().getVelocity(), MetersPerSecond));
+          // }
   ));
 
   }
