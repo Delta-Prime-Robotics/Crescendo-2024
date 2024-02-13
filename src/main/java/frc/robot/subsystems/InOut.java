@@ -30,12 +30,19 @@ import frc.robot.Constants.NeoMotorConstants;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class InOut extends SubsystemBase {
+ 
   //Output Top & Bottom 
   private final CANSparkMax m_FollowerShooter;
   private final CANSparkMax m_LeaderShooter;
   private SparkPIDController shooterPIDController;
   private final CANSparkMax m_intakeSparkMax;
+
+  private static double kFF = 1;
+  private static double kP = 0;
+  private static double kI = 0;
+  private static double kD = 0;
   
   //IR Beam Break
   public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
@@ -58,10 +65,10 @@ public class InOut extends SubsystemBase {
 
     //Seting Shooter PID Controler
     this.shooterPIDController = m_LeaderShooter.getPIDController();
-    this.shooterPIDController.setFF(1);
-    this.shooterPIDController.setP(0);
-    this.shooterPIDController.setI(0);
-    this.shooterPIDController.setD(0);
+    this.shooterPIDController.setFF(kFF);
+    this.shooterPIDController.setP(kP);
+    this.shooterPIDController.setI(kI);
+    this.shooterPIDController.setD(kD);
 
     //setting CAN ID's for Intake Motor Controler
     m_intakeSparkMax = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
@@ -85,10 +92,15 @@ public class InOut extends SubsystemBase {
     return () -> bbInput.get();
   }
 
-  //Shooter set speed
+  
+  /**
+   * sets the Velocity setpoint of the PIDControler to inputed speed
+   * @param speed in rpm
+   */
   public void setShooter(double speed){
     this.shooterPIDController.setReference(speed, ControlType.kVelocity); //Speed is in RPMs
   }
+
 
   public void intakeNote(double speed, boolean maunalOveride){
     if (maunalOveride){
@@ -109,6 +121,16 @@ public class InOut extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-  }
+    double p = SmartDashboard.getNumber("P Gain", 0);
+    double i = SmartDashboard.getNumber("I Gain", 0);
+    double d = SmartDashboard.getNumber("D Gain", 0);
+    double ff = SmartDashboard.getNumber("Feed Forward", 0);
 
+    // if PID coefficients on SmartDashboard have changed, write new values to controller
+    if((p != kP)) { shooterPIDController.setP(p); kP = p; }
+    if((i != kI)) { shooterPIDController.setI(i); kI = i; }
+    if((d != kD)) { shooterPIDController.setD(d); kD = d; }
+    if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
+
+  }
 }
