@@ -113,8 +113,12 @@ public class RobotContainer {
     Trigger intakeMaunalOveride = new JoystickButton(m_operatorGamepad,GamePad.Button.kY);
 
     new JoystickButton(m_operatorGamepad, GamePad.Button.kA)
-    .onTrue(new RunCommand(() -> m_InOut.intakeNote(1, intakeMaunalOveride.getAsBoolean()), m_InOut))
-    .onFalse(new InstantCommand(() -> m_InOut.intakeNote(0,true), m_InOut));
+      .onTrue(new RunCommand(
+        () -> m_InOut.intakeNote(1, intakeMaunalOveride.getAsBoolean()), m_InOut
+      ))
+      .onFalse(new InstantCommand(
+        () -> m_InOut.intakeNote(0,true), m_InOut
+      ));
 
     //Shooter Comand
     new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
@@ -125,12 +129,7 @@ public class RobotContainer {
     new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
     .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
     .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
-
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kA).whileTrue(m_InOut.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kY).whileTrue(m_InOut.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kX).whileTrue(m_InOut.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kB).whileTrue(m_InOut.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
+    
   }
 
   /**

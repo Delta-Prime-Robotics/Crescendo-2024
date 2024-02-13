@@ -23,9 +23,6 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_leftArm; 
   private final CANSparkMax m_rightArm;
   private final DutyCycleEncoder m_encoder;
-  
-  public PIDController m_armController = new PIDController(0,0,0,1);
-  public ArmFeedforward m_Feedforward = new ArmFeedforward(0,0,0,0);
 
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
@@ -33,6 +30,8 @@ public class ArmSubsystem extends SubsystemBase {
     m_rightArm = new CANSparkMax(ArmConstants.kArmRightCanId, MotorType.kBrushless);
     //makeing left arm the leader
     m_rightArm.follow(m_leftArm);
+
+    //ArmPID and FeedForward
 
     //set smartCurrentLimits
     m_leftArm.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
@@ -43,8 +42,6 @@ public class ArmSubsystem extends SubsystemBase {
     m_rightArm.setIdleMode(ArmConstants.kArmIdleMode);
 
     m_encoder = new DutyCycleEncoder(ArmConstants.kArmEncoderDIO);
-    m_armController = new PIDController(0,0,0,1);
-    m_Feedforward = new ArmFeedforward(0,0,0,0);
   }
 
   public DoubleSupplier getPosition() {
@@ -57,19 +54,6 @@ public class ArmSubsystem extends SubsystemBase {
   public void armRun(double speed){
    m_leftArm.set(speed);
   }
-
-  public void setArmVoltage(double voltage) {
-    //voltage constrants?
-    m_leftArm.setVoltage(voltage);
-  }
-
-  PIDCommand ampPosition = new PIDCommand(
-      m_armController,
-      getPosition(), 
-      ArmConstants.kAmpSetpoint, 
-      output -> setArmVoltage(output + m_Feedforward.calculate(ArmConstants.kAmpSetpoint, ArmConstants.kArmVelocity)), 
-      this);
-  //make a Speaker command? its so close to the intake that it might not need it
   
   @Override
   public void periodic() {
