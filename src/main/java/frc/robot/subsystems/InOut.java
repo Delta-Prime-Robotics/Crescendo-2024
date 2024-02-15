@@ -6,8 +6,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -15,21 +17,10 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 
 import java.util.function.BooleanSupplier;
-import static edu.wpi.first.units.MutableMeasure.mutable;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
 import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
 import frc.robot.Constants.NeoMotorConstants;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class InOut extends SubsystemBase {
  
@@ -37,7 +28,7 @@ public class InOut extends SubsystemBase {
   private final CANSparkMax m_FollowerShooter;
   private final CANSparkMax m_LeaderShooter;
   private SparkPIDController shooterPIDController;
-  private final CANSparkMax m_intakeSparkMax;
+  private final CANSparkMax m_intake;
 
   private static double kFF = 1;
   private static double kP = 0;
@@ -71,9 +62,10 @@ public class InOut extends SubsystemBase {
     this.shooterPIDController.setD(kD);
 
     //setting CAN ID's for Intake Motor Controler
-    m_intakeSparkMax = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
-    m_intakeSparkMax.setIdleMode(InOutConstants.kIntakeIdleMode);
-    m_intakeSparkMax.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
+    m_intake = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
+    m_intake.setIdleMode(InOutConstants.kIntakeIdleMode);
+    m_intake.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
+    
   }
 
   //Note detector
@@ -92,30 +84,53 @@ public class InOut extends SubsystemBase {
     return () -> bbInput.get();
   }
 
-  
-  /**
+   /**
    * sets the Velocity setpoint of the PIDControler to inputed speed
    * @param speed in rpm
    */
-  public void setShooter(double speed){
-    this.shooterPIDController.setReference(speed, ControlType.kVelocity); //Speed is in RPMs
+  public void setShooterRef(double speed) {
+    shooterPIDController.setReference(speed, ControlType.kVelocity);
   }
 
+  //TO-DO
+  //GO THROUGH THIS one by one to test if it works
+  public Command shootIntoSpeaker(){
+    double shooterVelocity = m_LeaderShooter.getEncoder().getVelocity();
+    final double kspeed = 300; //Speed is in RPMs
+    
+    SequentialCommandGroup sequence = new SequentialCommandGroup();
+      sequence.addCommands(
+        new InstantCommand(() -> setShooterRef(kspeed)) 
+        //if this doesnt work maybe set to RunCommand, it might need to be updating multible times
+        .deadlineWith(new WaitUntilCommand(() -> shooterVelocity == kspeed)),
+        //This might not work because the lamda is pointing to a boolean and is not a boolen sublyer
+        intoShooter(),
+        new InstantCommand(() -> setShooterRef(0))
+      );
+    return sequence;
+  }
+  
+  public Command intoShooter(){
+    return new InstantCommand(() -> m_intake.set(0.75))
+    .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    .andThen(new InstantCommand(() -> m_intake.set(0)));
+  }
 
+  //if manual Overide is True it will ignore The Beam Break
   public void intakeNote(double speed, boolean maunalOveride){
     if (maunalOveride){
-      m_intakeSparkMax.set(speed);
+      m_intake.set(speed);
     }
     else if (isNoteInIntake().getAsBoolean()) {
-      m_intakeSparkMax.set(0);
+      m_intake.set(0);
     }
     else{
-      m_intakeSparkMax.set(speed);
+      m_intake.set(speed);
     }
   }
 
   public InstantCommand intakeStop(){
-    return new InstantCommand(() -> m_intakeSparkMax.set(0));
+    return new InstantCommand(() -> m_intake.set(0));
   }
   
   @Override

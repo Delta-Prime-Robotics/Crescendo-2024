@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Dashboard extends SubsystemBase {
-  private static InOut m_InOut;
+  private InOut m_InOut;
   private DriveSubsystem m_Drive;
   private ArmSubsystem m_Arm;
 

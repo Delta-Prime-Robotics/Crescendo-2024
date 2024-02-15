@@ -154,7 +154,7 @@ public final class Constants {
     public static final int kBeamBreakDIO = 0;
     // Idle modes
     public static final IdleMode kShooterIdleMode = IdleMode.kCoast;
-    public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;
+    public static final IdleMode kIntakeIdleMode = IdleMode.kCoast;
   }
 
   public final class ArmConstants {

@@ -121,15 +121,15 @@ public class RobotContainer {
       ));
 
     //Shooter Comand
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
-    .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
-    .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
+    // new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
+    // .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
+    // .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
     
     //arm command
     new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
     .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
     .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
-    
+
   }
 
   /**
