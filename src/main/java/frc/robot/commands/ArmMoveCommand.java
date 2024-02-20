@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -15,7 +16,7 @@ public class ArmMoveCommand extends Command {
  
   private final ArmSubsystem m_armSubsystem;
   private final DoubleSupplier m_forwardSpeedSupplier;
-
+  private boolean isHittingInArmMove = false;
 
   /** Creates a new ArcadeDriveCommand. */
   public ArmMoveCommand(ArmSubsystem armSubsystem, DoubleSupplier forwardSpeedSupplier) {
@@ -28,7 +29,8 @@ public class ArmMoveCommand extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -38,6 +40,9 @@ public class ArmMoveCommand extends Command {
     double scaledForwardSpeed = m_forwardSpeedSupplier.getAsDouble() * kForwardScaleFactor;
     
     m_armSubsystem.armRun(scaledForwardSpeed);
+    isHittingInArmMove =! isHittingInArmMove;
+    SmartDashboard.putBoolean("is Hitting in Arm Move", isHittingInArmMove);
+    SmartDashboard.putNumber("forwardSpeed", scaledForwardSpeed);
   }
 
   // Returns true when the command should end.

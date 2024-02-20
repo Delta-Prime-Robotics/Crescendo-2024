@@ -82,10 +82,12 @@ public class RobotContainer {
         m_robotDrive));
     
     //Manual Arm
+    
     if (m_Arm != null && m_operatorGamepad != null) {
       m_Arm.setDefaultCommand(new ArmMoveCommand(m_Arm, 
-      () -> -m_operatorGamepad.getRawAxis(GamePad.LeftStick.kUpDown) 
+      () -> -m_operatorGamepad.getRawAxis(GamePad.LeftStick.kUpDown)
       ));
+
     }
 
 
@@ -125,10 +127,10 @@ public class RobotContainer {
     // .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
     // .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
     
-    //arm command
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
-    .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
-    .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
+    // //arm command
+    // new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
+    // .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
+    // .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
 
   }
 

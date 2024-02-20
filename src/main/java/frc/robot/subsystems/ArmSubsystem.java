@@ -34,32 +34,36 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmSubsystem() {
     m_leader = new CANSparkMax(ArmConstants.kArmLeftCanId, MotorType.kBrushless);
     m_follower = new CANSparkMax(ArmConstants.kArmRightCanId, MotorType.kBrushless);
+    
     //makeing left arm the leader
-    m_follower.follow(m_leader);
+    m_follower.follow(m_leader, true);
     //set smartCurrentLimits
     m_leader.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
     m_follower.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
     //Set IdleMode's
     m_leader.setIdleMode(ArmConstants.kArmIdleMode);
     m_follower.setIdleMode(ArmConstants.kArmIdleMode);
-    m_leader.burnFlash();
-    m_follower.burnFlash();
     
-    //Encoder
-    m_AbsoluteEncoder = this.m_leader.getAbsoluteEncoder(Type.kDutyCycle);
-    m_AbsoluteEncoder.setZeroOffset(0);// set this so it equals 0 when arm is touching ground. 
+    
+    // //Encoder
+    // m_AbsoluteEncoder = this.m_leader.getAbsoluteEncoder(Type.kDutyCycle);
+    // m_AbsoluteEncoder.setZeroOffset(0);// set this so it equals 0 when arm is touching ground. 
     //ArmPID and FeedForward
-    m_pidControler = this.m_leader.getPIDController();
-    m_pidControler.setP(0);
-    m_pidControler.setI(0);
-    m_pidControler.setD(0);
-    m_pidControler.setFF(0);
-    m_pidControler.setFeedbackDevice(m_AbsoluteEncoder);
+    // m_pidControler = this.m_leader.getPIDController();
+    // m_pidControler.setP(0);
+    // m_pidControler.setI(0);
+    // m_pidControler.setD(0);
+    // m_pidControler.setFF(0);
+    // m_pidControler.setFeedbackDevice(m_AbsoluteEncoder);
     
   }
 
+  
+  
   public void armRun(double speed){
    m_leader.set(speed);
+   SmartDashboard.putNumber("speed", speed);
+   
   }
   
   
@@ -73,12 +77,11 @@ public class ArmSubsystem extends SubsystemBase {
     m_pidControler.setReference(kSpeakerPosition, ControlType.kPosition);
 
   }
-
-
   
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  
     
   }
 }
