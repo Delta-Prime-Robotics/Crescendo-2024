@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -83,13 +84,12 @@ public class RobotContainer {
     
     //Manual Arm
     
-    if (m_Arm != null && m_operatorGamepad != null) {
-      m_Arm.setDefaultCommand(new ArmMoveCommand(m_Arm, 
-      () -> -m_operatorGamepad.getRawAxis(GamePad.LeftStick.kUpDown)
-      ));
+    // if (m_Arm != null && m_operatorGamepad != null) {
+    //   m_Arm.setDefaultCommand(new ArmMoveCommand(m_Arm, 
+    //   () -> -m_operatorGamepad.getRawAxis(GamePad.LeftStick.kUpDown)
+    //   ));
 
-    }
-
+    // }
 
   }
 
@@ -131,7 +131,12 @@ public class RobotContainer {
     // new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
     // .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
     // .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
+    new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
+    .onTrue(m_InOut.intoShooter());
 
+    new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
+    .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(m_InOut.kSetpoint)))
+    .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
   }
 
   /**
