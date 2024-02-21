@@ -30,11 +30,14 @@ public class InOut extends SubsystemBase {
   private SparkPIDController shooterPIDController;
   private final CANSparkMax m_intake;
 
-  private static double kFF = 1;
+  private static double kFF = 0.5;
   private static double kP = 0;
   private static double kI = 0;
   private static double kD = 0;
-  
+  public static double kSetpoint = 50;
+  private static final double kMinOutput = -1;
+  private static final double kMaxOutput = 1;
+  private static final double kMaxRPM = 4800;
   //IR Beam Break
   public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
 
@@ -60,7 +63,13 @@ public class InOut extends SubsystemBase {
     this.shooterPIDController.setP(kP);
     this.shooterPIDController.setI(kI);
     this.shooterPIDController.setD(kD);
-
+    this.shooterPIDController.setOutputRange(kMinOutput, kMaxOutput);
+    
+    SmartDashboard.putNumber("P Gain", kP);
+    SmartDashboard.putNumber("I Gain", kI);
+    SmartDashboard.putNumber("D Gain", kD);
+    SmartDashboard.putNumber("Feed Forward", kFF);
+    SmartDashboard.putNumber("setpoint", kSetpoint);
     //setting CAN ID's for Intake Motor Controler
     m_intake = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
     m_intake.setIdleMode(InOutConstants.kIntakeIdleMode);
@@ -140,12 +149,14 @@ public class InOut extends SubsystemBase {
     double i = SmartDashboard.getNumber("I Gain", 0);
     double d = SmartDashboard.getNumber("D Gain", 0);
     double ff = SmartDashboard.getNumber("Feed Forward", 0);
-
+    double setpoint = SmartDashboard.getNumber("setpoint",0);
+    setpoint = kSetpoint;
     // if PID coefficients on SmartDashboard have changed, write new values to controller
     if((p != kP)) { shooterPIDController.setP(p); kP = p; }
     if((i != kI)) { shooterPIDController.setI(i); kI = i; }
     if((d != kD)) { shooterPIDController.setD(d); kD = d; }
     if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
-
+    SmartDashboard.putNumber("shooter volocity", m_LeaderShooter.getEncoder().getVelocity());
   }
+  
 }
