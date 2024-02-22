@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import java.util.function.DoubleSupplier;
 
 
@@ -14,10 +16,13 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
+import edu.wpi.first.units.*;
+import edu.wpi.first.math.MathUtil;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.NeoMotorConstants;
@@ -47,41 +52,75 @@ public class ArmSubsystem extends SubsystemBase {
     
     // //Encoder
     m_AbsoluteEncoder = this.m_leader.getAbsoluteEncoder(Type.kDutyCycle);
-    m_AbsoluteEncoder.setZeroOffset(5.4313325);
-    SmartDashboard.putNumber("AbsoluteEncoder", m_AbsoluteEncoder.getPosition());
 
-    //ArmPID and FeedForward
-    // m_pidControler = this.m_leader.getPIDController();
-    // m_pidControler.setP(0);
-    // m_pidControler.setI(0);
-    // m_pidControler.setD(0);
-    // m_pidControler.setFF(0);
-    // m_pidControler.setFeedbackDevice(m_AbsoluteEncoder);
+    // ArmPID and FeedForward
+    m_pidControler = this.m_leader.getPIDController();
+    m_pidControler.setP(0);
+    m_pidControler.setI(0);
+    m_pidControler.setD(0);
+    m_pidControler.setFF(0);
+    m_pidControler.setFeedbackDevice(m_AbsoluteEncoder);
     
   }
 
+  public void setRef(double rotations){
+    m_pidControler.setReference(rotations, ControlType.kPosition);
+  }
+
+  public static enum ArmState {
+    AMP,
+    SPEAKER,
+    GROUND,
+    ERECT,
+    NOSTATE
+  }
+
+  public final ArmState armStateLogic() {
+    double tolerance = 0.005;
+
+    if(MathUtil.isNear(ArmConstants.kAmpPosition, armRotation(),tolerance))
+    {
+      return ArmState.AMP;
+    }
+    else if(MathUtil.isNear(ArmConstants.kSpeakerPosition, armRotation(),tolerance))
+    {
+      return ArmState.SPEAKER;
+    }
+    else if(MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(),tolerance))
+    {
+      return ArmState.GROUND;
+    }
+
+    else if(MathUtil.isNear(ArmConstants.kErectPosition, armRotation(),tolerance))
+    {
+      return ArmState.ERECT;
+    }
+    return ArmState.NOSTATE;
+  }
   
+  /**Postion of the Arm in rotations. 
+   * 0 to 1, wraps back to zero*/
+  public double armRotation() {
+    return this.m_AbsoluteEncoder.getPosition();
+  }
   
   public void armRun(double speed){
    m_leader.set(speed);
    SmartDashboard.putNumber("speed", speed);
-   
   }
   
   
-  public void goToAmp() {
-    double kAmpPosition = 0; //In Rotations
-    m_pidControler.setReference(kAmpPosition, ControlType.kPosition); 
+  public Command goToAmp() {
+    return this.run(()-> setRef(ArmConstants.kAmpPosition));
   }
 
-  public void goToSpeaker() {
-    double kSpeakerPosition = 0; //In Rotations
-    m_pidControler.setReference(kSpeakerPosition, ControlType.kPosition);
-
+  public Command goToSpeaker() {
+    return this.run(()-> setRef(ArmConstants.kSpeakerPosition));
   }
   
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("AbsoluteEncoder",  armRotation());
     // This method will be called once per scheduler run
   
     

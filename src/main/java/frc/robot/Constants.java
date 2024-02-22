@@ -4,12 +4,16 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Measure;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -165,11 +169,9 @@ public final class Constants {
     public static final int kArmEncoderDIO = 1;
     //Idle Mode
     public static final IdleMode kArmIdleMode = IdleMode.kBrake;
-    //Setpoints
-    public static final double kAmpSetpoint = 1;
-
-    public static final double kArmVelocity = 0;
-   
+    //Setpoints in rotations ranging from 0 to 1 and wraping around. 
+    public final double kAmpPosition = 0;
+    public final double kSpeakerPosition = 0;
   }
 
   /*Usb port Constants for Laptop */
