@@ -30,11 +30,13 @@ public class InOut extends SubsystemBase {
   private SparkPIDController shooterPIDController;
   private final CANSparkMax m_intake;
 
-  private static double kFF = 0.5;
+  private static boolean noteState = false; //false is out //true is in
+
+  private static double kFF = 0.00024;
   private static double kP = 0;
   private static double kI = 0;
   private static double kD = 0;
-  public static double kSetpoint = 50;
+  public static double kSetpoint = 1500;
   private static final double kMinOutput = -1;
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
@@ -47,7 +49,9 @@ public class InOut extends SubsystemBase {
     //setting CAN ID's for Shooter Motor Controlers
     m_FollowerShooter = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);//Bottom
     m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
+    m_LeaderShooter.setInverted(true);
     m_FollowerShooter.follow(m_LeaderShooter);
+
 
     //Set Current Limit
     m_FollowerShooter.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
@@ -78,19 +82,13 @@ public class InOut extends SubsystemBase {
   }
 
   //Note detector
-  public BooleanSupplier isNoteInIntake() {
+  public boolean isNoteInIntake() {
     //when the BeamBreak is false there is a note in the Intake
-    if (bbInput.get() == false) {
-      return () -> true; 
+    if (bbInput.get() == false)  {
+      noteState =! noteState;
     }
-    else{
-    return () -> false;
-    }
-  }
 
-  //Beam Break will return true when there is no Note
-  public BooleanSupplier isNoteOutOfIntake() {
-    return () -> bbInput.get();
+    return noteState;
   }
 
    /**
@@ -101,17 +99,20 @@ public class InOut extends SubsystemBase {
     shooterPIDController.setReference(speed, ControlType.kVelocity);
   }
 
+  public double shooterVelocity() {
+    return -m_LeaderShooter.getEncoder().getVelocity();
+  }
+
   //TO-DO
   //GO THROUGH THIS one by one to test if it works
   public Command shootIntoSpeaker(){
-    double shooterVelocity = m_LeaderShooter.getEncoder().getVelocity();
     final double kspeed = 300; //Speed is in RPMs
     
     SequentialCommandGroup sequence = new SequentialCommandGroup();
       sequence.addCommands(
         new InstantCommand(() -> setShooterRef(kspeed)) 
         //if this doesnt work maybe set to RunCommand, it might need to be updating multible times
-        .deadlineWith(new WaitUntilCommand(() -> shooterVelocity == kspeed)),
+        .deadlineWith(new WaitUntilCommand(() -> shooterVelocity() == kspeed)),
         //This might not work because the lamda is pointing to a boolean and is not a boolen sublyer
         intoShooter(),
         new InstantCommand(() -> setShooterRef(0))
@@ -119,7 +120,7 @@ public class InOut extends SubsystemBase {
     return sequence;
   }
   
-  public Command intoShooter(){
+    public Command intoShooter(){
     return new InstantCommand(() -> m_intake.set(0.75))
     .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
     .andThen(new InstantCommand(() -> m_intake.set(0)));
@@ -128,14 +129,18 @@ public class InOut extends SubsystemBase {
   //if manual Overide is True it will ignore The Beam Break
   public void intakeNote(double speed, boolean maunalOveride){
     if (maunalOveride){
-      m_intake.set(speed);
+      setIntakeSpeed(speed);
     }
-    else if (isNoteInIntake().getAsBoolean()) {
-      m_intake.set(0);
+    else if (isNoteInIntake()) {
+      setIntakeSpeed(0);
     }
     else{
-      m_intake.set(speed);
+      setIntakeSpeed(speed);
     }
+  }
+
+  public void setIntakeSpeed(double speed) {
+    m_intake.set(speed);
   }
 
   public InstantCommand intakeStop(){
@@ -151,12 +156,14 @@ public class InOut extends SubsystemBase {
     double ff = SmartDashboard.getNumber("Feed Forward", 0);
     double setpoint = SmartDashboard.getNumber("setpoint",0);
     setpoint = kSetpoint;
+    
     // if PID coefficients on SmartDashboard have changed, write new values to controller
     if((p != kP)) { shooterPIDController.setP(p); kP = p; }
     if((i != kI)) { shooterPIDController.setI(i); kI = i; }
     if((d != kD)) { shooterPIDController.setD(d); kD = d; }
     if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
-    SmartDashboard.putNumber("shooter volocity", m_LeaderShooter.getEncoder().getVelocity());
+    SmartDashboard.putBoolean("noteState", noteState);
+    SmartDashboard.putNumber("shooter volocity", shooterVelocity());
   }
   
 }

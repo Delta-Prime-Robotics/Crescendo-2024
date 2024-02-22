@@ -46,8 +46,10 @@ public class ArmSubsystem extends SubsystemBase {
     
     
     // //Encoder
-    // m_AbsoluteEncoder = this.m_leader.getAbsoluteEncoder(Type.kDutyCycle);
-    // m_AbsoluteEncoder.setZeroOffset(0);// set this so it equals 0 when arm is touching ground. 
+    m_AbsoluteEncoder = this.m_leader.getAbsoluteEncoder(Type.kDutyCycle);
+    m_AbsoluteEncoder.setZeroOffset(5.4313325);
+    SmartDashboard.putNumber("AbsoluteEncoder", m_AbsoluteEncoder.getPosition());
+
     //ArmPID and FeedForward
     // m_pidControler = this.m_leader.getPIDController();
     // m_pidControler.setP(0);
