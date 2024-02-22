@@ -13,13 +13,16 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
 
 import java.util.function.BooleanSupplier;
 import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
 import frc.robot.Constants.NeoMotorConstants;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class InOut extends SubsystemBase {
@@ -27,9 +30,9 @@ public class InOut extends SubsystemBase {
   //Output Top & Bottom 
   private final CANSparkMax m_FollowerShooter;
   private final CANSparkMax m_LeaderShooter;
-  private SparkPIDController shooterPIDController;
   private final CANSparkMax m_intake;
-
+  private SparkPIDController shooterPIDController;
+  private RelativeEncoder m_Encoder;
   private static boolean noteState = false; //false is out //true is in
 
   private static double kFF = 0.00024;
@@ -42,6 +45,7 @@ public class InOut extends SubsystemBase {
   private static final double kMaxRPM = 4800;
   //IR Beam Break
   public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
+  //Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   /** Creates a new InOut. */
   public InOut() {
@@ -51,15 +55,15 @@ public class InOut extends SubsystemBase {
     m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
     m_LeaderShooter.setInverted(true);
     m_FollowerShooter.follow(m_LeaderShooter);
-
-
     //Set Current Limit
     m_FollowerShooter.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
     m_LeaderShooter.setSmartCurrentLimit(NeoMotorConstants.kNeoSetCurrent);
- 
     //seting idle to coast
     m_FollowerShooter.setIdleMode(InOutConstants.kShooterIdleMode);
     m_LeaderShooter.setIdleMode(InOutConstants.kShooterIdleMode);
+    //Shooter Encoder 
+    m_Encoder = this.m_LeaderShooter.getEncoder();
+    m_Encoder.setInverted(true);
 
     //Seting Shooter PID Controler
     this.shooterPIDController = m_LeaderShooter.getPIDController();
@@ -68,27 +72,16 @@ public class InOut extends SubsystemBase {
     this.shooterPIDController.setI(kI);
     this.shooterPIDController.setD(kD);
     this.shooterPIDController.setOutputRange(kMinOutput, kMaxOutput);
-    
     SmartDashboard.putNumber("P Gain", kP);
     SmartDashboard.putNumber("I Gain", kI);
     SmartDashboard.putNumber("D Gain", kD);
     SmartDashboard.putNumber("Feed Forward", kFF);
     SmartDashboard.putNumber("setpoint", kSetpoint);
+   
     //setting CAN ID's for Intake Motor Controler
     m_intake = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
     m_intake.setIdleMode(InOutConstants.kIntakeIdleMode);
     m_intake.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
-    
-  }
-
-  //Note detector
-  public boolean isNoteInIntake() {
-    //when the BeamBreak is false there is a note in the Intake
-    if (bbInput.get() == false)  {
-      noteState =! noteState;
-    }
-
-    return noteState;
   }
 
    /**
@@ -99,8 +92,8 @@ public class InOut extends SubsystemBase {
     shooterPIDController.setReference(speed, ControlType.kVelocity);
   }
 
-  public double shooterVelocity() {
-    return -m_LeaderShooter.getEncoder().getVelocity();
+  private double shooterVelocity() {
+    return m_Encoder.getVelocity();
   }
 
   //TO-DO
@@ -120,10 +113,14 @@ public class InOut extends SubsystemBase {
     return sequence;
   }
   
-    public Command intoShooter(){
-    return new InstantCommand(() -> m_intake.set(0.75))
-    .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    .andThen(new InstantCommand(() -> m_intake.set(0)));
+  public Command intoShooter() {
+    // return new InstantCommand(() -> m_intake.set(0.75))
+    // .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    // .andThen(new InstantCommand(() -> m_intake.set(0)));
+    return 
+    this.startEnd(() -> m_intake.set(0.75), () -> m_intake.set(0))
+    .deadlineWith(new WaitUntilCommand(()->isNoteInIntake()).withTimeout(1.5)); // i like this, hopefuly it works
+
   }
 
   //if manual Overide is True it will ignore The Beam Break
@@ -139,12 +136,17 @@ public class InOut extends SubsystemBase {
     }
   }
 
-  public void setIntakeSpeed(double speed) {
-    m_intake.set(speed);
+  //Note detector
+  public boolean isNoteInIntake() {
+    //when the BeamBreak is false there is a note in the Intake
+    if (bbInput.get() == false) {
+      noteState =! noteState;
+    }
+    return noteState;
   }
 
-  public InstantCommand intakeStop(){
-    return new InstantCommand(() -> m_intake.set(0));
+  public void setIntakeSpeed(double speed) {
+    m_intake.set(speed);
   }
   
   @Override
@@ -155,13 +157,14 @@ public class InOut extends SubsystemBase {
     double d = SmartDashboard.getNumber("D Gain", 0);
     double ff = SmartDashboard.getNumber("Feed Forward", 0);
     double setpoint = SmartDashboard.getNumber("setpoint",0);
-    setpoint = kSetpoint;
     
     // if PID coefficients on SmartDashboard have changed, write new values to controller
     if((p != kP)) { shooterPIDController.setP(p); kP = p; }
     if((i != kI)) { shooterPIDController.setI(i); kI = i; }
     if((d != kD)) { shooterPIDController.setD(d); kD = d; }
     if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
+    if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
+
     SmartDashboard.putBoolean("noteState", noteState);
     SmartDashboard.putNumber("shooter volocity", shooterVelocity());
   }
