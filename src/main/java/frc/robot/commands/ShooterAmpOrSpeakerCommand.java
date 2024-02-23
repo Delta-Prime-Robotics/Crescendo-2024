@@ -7,15 +7,15 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.InOut;
 import frc.robot.subsystems.ArmSubsystem.ArmState;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
-import edu.wpi.first.math.util.Units.*;
-
-public class ShooterAmpOrSpeakerCommand  {
+public class ShooterAmpOrSpeakerCommand extends Command {
   private static ArmSubsystem m_arm;
   private static InOut m_InOut;
 
@@ -24,14 +24,23 @@ public class ShooterAmpOrSpeakerCommand  {
     m_arm = armSubsystem;
     m_InOut = inOutSubsystem;
   }
-  
-  public Command poopFart(){
+
+  private final Command commandToRun =
     new SelectCommand<>(
-      // Maps selector values to commands
       Map.ofEntries(
-        Map.entry(ArmState.AMP, new PrintCommand("AMP SHOOT HAHAHHAHA")), 
-        Map.entry(ArmState.SPEAKER, new PrintCommand("SPEAKER SHOOT")),
-        Map.entry(ArmState.SPEAKER, new PrintCommand("SPEAKER SHOOT"))
-        ), m_arm.armStateLogic());  
+        Map.entry(ArmState.AMP, new PrintCommand("AMP POSITION")), 
+        Map.entry(ArmState.SPEAKER, new PrintCommand("SPEAKER POSITION")),
+        Map.entry(ArmState.GROUND, new PrintCommand("GROUND POSITION")),
+        Map.entry(ArmState.ERECT, new PrintCommand("ERECT POSITION"))
+        ), m_arm.armStateLogic);  
+  
+   @Override
+  public void initialize() {
+    commandToRun.schedule();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return commandToRun.isFinished();
   }
 }

@@ -7,7 +7,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Rotations;
 
 import java.util.function.DoubleSupplier;
-
+import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
@@ -60,11 +60,6 @@ public class ArmSubsystem extends SubsystemBase {
     m_pidControler.setD(0);
     m_pidControler.setFF(0);
     m_pidControler.setFeedbackDevice(m_AbsoluteEncoder);
-    
-  }
-
-  public void setRef(double rotations){
-    m_pidControler.setReference(rotations, ControlType.kPosition);
   }
 
   public static enum ArmState {
@@ -75,27 +70,25 @@ public class ArmSubsystem extends SubsystemBase {
     NOSTATE
   }
 
-  public final ArmState armStateLogic() {
+  public Supplier<ArmState> armStateLogic = () -> {
     double tolerance = 0.005;
-
-    if(MathUtil.isNear(ArmConstants.kAmpPosition, armRotation(),tolerance))
-    {
+    if(MathUtil.isNear(ArmConstants.kAmpPosition, armRotation(),tolerance)){
       return ArmState.AMP;
     }
-    else if(MathUtil.isNear(ArmConstants.kSpeakerPosition, armRotation(),tolerance))
-    {
+    else if(MathUtil.isNear(ArmConstants.kSpeakerPosition, armRotation(),tolerance)){
       return ArmState.SPEAKER;
     }
-    else if(MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(),tolerance))
-    {
+    else if(MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(),tolerance)){
       return ArmState.GROUND;
     }
-
-    else if(MathUtil.isNear(ArmConstants.kErectPosition, armRotation(),tolerance))
-    {
+    else if(MathUtil.isNear(ArmConstants.kErectPosition, armRotation(),tolerance)){
       return ArmState.ERECT;
     }
     return ArmState.NOSTATE;
+  };
+
+  public void setRef(double rotations){
+    m_pidControler.setReference(rotations, ControlType.kPosition);
   }
   
   /**Postion of the Arm in rotations. 
@@ -122,7 +115,5 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("AbsoluteEncoder",  armRotation());
     // This method will be called once per scheduler run
-  
-    
   }
 }
