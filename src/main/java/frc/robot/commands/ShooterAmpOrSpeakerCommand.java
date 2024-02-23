@@ -16,13 +16,14 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class ShooterAmpOrSpeakerCommand extends Command {
-  private static ArmSubsystem m_arm;
-  private static InOut m_InOut;
+  private ArmSubsystem m_arm;
+  private InOut m_InOut;
 
   /** Creates a new ShooterAmpOrSpeakerCommand. */
   public ShooterAmpOrSpeakerCommand(ArmSubsystem armSubsystem, InOut inOutSubsystem) {
     m_arm = armSubsystem;
     m_InOut = inOutSubsystem;
+    addRequirements(m_arm, m_InOut);
   }
 
   private final Command commandToRun =
@@ -31,9 +32,10 @@ public class ShooterAmpOrSpeakerCommand extends Command {
         Map.entry(ArmState.AMP, new PrintCommand("AMP POSITION")), 
         Map.entry(ArmState.SPEAKER, new PrintCommand("SPEAKER POSITION")),
         Map.entry(ArmState.GROUND, new PrintCommand("GROUND POSITION")),
-        Map.entry(ArmState.ERECT, new PrintCommand("ERECT POSITION"))
-        ), m_arm.armStateLogic);  
-  
+        Map.entry(ArmState.ERECT, new PrintCommand("ERECT POSITION")),
+        Map.entry(ArmState.NOSTATE, new PrintCommand("NOSTATE POSITION"))
+        ), m_arm.armStateLogic); //ignore the static :P 
+
    @Override
   public void initialize() {
     commandToRun.schedule();

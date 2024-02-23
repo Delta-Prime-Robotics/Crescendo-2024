@@ -30,6 +30,7 @@ import frc.robot.Constants.GamePad.Button;
 import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
 import frc.robot.commands.ArmManualMoveCommand;
+import frc.robot.commands.ShooterAmpOrSpeakerCommand;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Dashboard;
@@ -63,7 +64,7 @@ public class RobotContainer {
     
     // Configure the button bindings
     configureBindings();
-    m_Dashboard.register();
+m_Dashboard.register();
     
   }
   /**
@@ -122,6 +123,9 @@ public class RobotContainer {
     new JoystickButton(m_operatorGamepad, Button.kB)
     .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOut.kSetpoint)))
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
+
+    new JoystickButton(m_operatorGamepad, Button.kLT)
+    .onTrue(new ShooterAmpOrSpeakerCommand(m_Arm, m_InOut));
   }
 
   /**

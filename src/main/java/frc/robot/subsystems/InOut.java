@@ -23,6 +23,9 @@ import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
 import frc.robot.Constants.NeoMotorConstants;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class InOut extends SubsystemBase {
@@ -31,8 +34,8 @@ public class InOut extends SubsystemBase {
   private final CANSparkMax m_FollowerShooter;
   private final CANSparkMax m_LeaderShooter;
   private final CANSparkMax m_intake;
-  private SparkPIDController shooterPIDController;
-  private RelativeEncoder m_Encoder;
+  private static SparkPIDController shooterPIDController;
+  private static RelativeEncoder m_Encoder;
   private static boolean noteState = false; //false is out //true is in
 
   private static double kFF = 0.00024;
@@ -63,7 +66,6 @@ public class InOut extends SubsystemBase {
     m_LeaderShooter.setIdleMode(InOutConstants.kShooterIdleMode);
     //Shooter Encoder 
     m_Encoder = this.m_LeaderShooter.getEncoder();
-    m_Encoder.setInverted(true);
 
     //Seting Shooter PID Controler
     this.shooterPIDController = m_LeaderShooter.getPIDController();
@@ -92,8 +94,15 @@ public class InOut extends SubsystemBase {
     shooterPIDController.setReference(speed, ControlType.kVelocity);
   }
 
-  private double shooterVelocity() {
-    return m_Encoder.getVelocity();
+  private static double shooterVelocity(boolean inMPS) {
+    double velocityInRPM = -m_Encoder.getVelocity();
+    double wheelDiameter = 0.2; 
+    // Convert RPM to Rotations per Second
+    double rotationsPerSecond = velocityInRPM / 60.0;
+    // Convert Rotations per Second to Meters per Second
+    double velocityInMPS = rotationsPerSecond * (wheelDiameter * Math.PI);
+    return (inMPS?velocityInMPS:velocityInRPM);
+  
   }
 
   //TO-DO
@@ -105,7 +114,7 @@ public class InOut extends SubsystemBase {
       sequence.addCommands(
         new InstantCommand(() -> setShooterRef(kspeed)) 
         //if this doesnt work maybe set to RunCommand, it might need to be updating multible times
-        .deadlineWith(new WaitUntilCommand(() -> shooterVelocity() == kspeed)),
+        .deadlineWith(new WaitUntilCommand(() -> shooterVelocity(false) == kspeed)),
         //This might not work because the lamda is pointing to a boolean and is not a boolen sublyer
         intoShooter(),
         new InstantCommand(() -> setShooterRef(0))
@@ -166,7 +175,7 @@ public class InOut extends SubsystemBase {
     if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
 
     SmartDashboard.putBoolean("noteState", noteState);
-    SmartDashboard.putNumber("shooter volocity", shooterVelocity());
+    SmartDashboard.putNumber("shooter volocity", shooterVelocity(false));
   }
   
 }

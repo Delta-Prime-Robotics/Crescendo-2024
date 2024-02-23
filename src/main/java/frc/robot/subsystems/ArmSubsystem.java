@@ -32,9 +32,9 @@ public class ArmSubsystem extends SubsystemBase {
   //Setting arms and Encoder
   private final CANSparkMax m_leader; //left arm
   private final CANSparkMax m_follower; //right arm
-  private SparkAbsoluteEncoder m_AbsoluteEncoder;
-  private SparkPIDController m_pidControler;
-
+  private static SparkAbsoluteEncoder m_AbsoluteEncoder;
+  private static SparkPIDController m_pidControler;
+  
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
     m_leader = new CANSparkMax(ArmConstants.kArmLeftCanId, MotorType.kBrushless);
@@ -49,7 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
     m_leader.setIdleMode(ArmConstants.kArmIdleMode);
     m_follower.setIdleMode(ArmConstants.kArmIdleMode);
     
-    
+   
     // //Encoder
     m_AbsoluteEncoder = this.m_leader.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -63,14 +63,25 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public static enum ArmState {
-    AMP,
-    SPEAKER,
-    GROUND,
-    ERECT,
-    NOSTATE
+    AMP("AMP"),
+    SPEAKER("SPEAKER"),
+    GROUND("GROUND"),
+    ERECT("ERECT"),
+    NOSTATE("NOSTATE");
+
+    private final String stringValue;
+
+    ArmState(String stringValue) {
+        this.stringValue = stringValue;
+    }
+
+    @Override
+    public String toString() {
+        return stringValue;
+    }
   }
 
-  public Supplier<ArmState> armStateLogic = () -> {
+  public static Supplier<ArmState> armStateLogic = () -> {
     double tolerance = 0.005;
     if(MathUtil.isNear(ArmConstants.kAmpPosition, armRotation(),tolerance)){
       return ArmState.AMP;
@@ -87,14 +98,14 @@ public class ArmSubsystem extends SubsystemBase {
     return ArmState.NOSTATE;
   };
 
-  public void setRef(double rotations){
+  public static void setRef(double rotations){
     m_pidControler.setReference(rotations, ControlType.kPosition);
   }
   
   /**Postion of the Arm in rotations. 
    * 0 to 1, wraps back to zero*/
-  public double armRotation() {
-    return this.m_AbsoluteEncoder.getPosition();
+  public static double armRotation() {
+    return m_AbsoluteEncoder.getPosition();
   }
   
   public void armRun(double speed){
@@ -114,6 +125,7 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("AbsoluteEncoder",  armRotation());
+    SmartDashboard.putString("armState", armStateLogic.get().toString());
     // This method will be called once per scheduler run
   }
 }
