@@ -34,15 +34,15 @@ public class InOut extends SubsystemBase {
   private final CANSparkMax m_FollowerShooter;
   private final CANSparkMax m_LeaderShooter;
   private final CANSparkMax m_intake;
-  private static SparkPIDController shooterPIDController;
+  private SparkPIDController shooterPIDController;
   private static RelativeEncoder m_Encoder;
   private static boolean noteState = false; //false is out //true is in
 
-  private static double kFF = 0.00024;
-  private static double kP = 0;
+  private static double kFF = 0.0002;
+  private static double kP = 0.0001;
   private static double kI = 0;
   private static double kD = 0;
-  public static double kSetpoint = 1500;
+  public static double kSetpoint = 1400;
   private static final double kMinOutput = -1;
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
@@ -54,8 +54,8 @@ public class InOut extends SubsystemBase {
   public InOut() {
 
     //setting CAN ID's for Shooter Motor Controlers
-    m_FollowerShooter = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);//Bottom
     m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
+    m_FollowerShooter = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);//Bottom
     m_LeaderShooter.setInverted(true);
     m_FollowerShooter.follow(m_LeaderShooter);
     //Set Current Limit
@@ -68,7 +68,7 @@ public class InOut extends SubsystemBase {
     m_Encoder = this.m_LeaderShooter.getEncoder();
 
     //Seting Shooter PID Controler
-    this.shooterPIDController = m_LeaderShooter.getPIDController();
+    shooterPIDController = m_LeaderShooter.getPIDController();
     this.shooterPIDController.setFF(kFF);
     this.shooterPIDController.setP(kP);
     this.shooterPIDController.setI(kI);
@@ -94,15 +94,15 @@ public class InOut extends SubsystemBase {
     shooterPIDController.setReference(speed, ControlType.kVelocity);
   }
 
-  private static double shooterVelocity(boolean inMPS) {
-    double velocityInRPM = -m_Encoder.getVelocity();
-    double wheelDiameter = 0.2; 
-    // Convert RPM to Rotations per Second
-    double rotationsPerSecond = velocityInRPM / 60.0;
-    // Convert Rotations per Second to Meters per Second
-    double velocityInMPS = rotationsPerSecond * (wheelDiameter * Math.PI);
-    return (inMPS?velocityInMPS:velocityInRPM);
-  
+  private static double shooterVelocity() {
+    // double velocityInRPM = -m_Encoder.getVelocity();
+    // double wheelDiameter = 0.2; 
+    // // Convert RPM to Rotations per Second
+    // double rotationsPerSecond = velocityInRPM / 60.0;
+    // // Convert Rotations per Second to Meters per Second
+    // double velocityInMPS = rotationsPerSecond * (wheelDiameter * Math.PI);
+    // return (inMPS?velocityInMPS:velocityInRPM);
+    return -m_Encoder.getVelocity();
   }
 
   //TO-DO
@@ -114,7 +114,7 @@ public class InOut extends SubsystemBase {
       sequence.addCommands(
         new InstantCommand(() -> setShooterRef(kspeed)) 
         //if this doesnt work maybe set to RunCommand, it might need to be updating multible times
-        .deadlineWith(new WaitUntilCommand(() -> shooterVelocity(false) == kspeed)),
+        .deadlineWith(new WaitUntilCommand(() -> shooterVelocity() == kspeed)),
         //This might not work because the lamda is pointing to a boolean and is not a boolen sublyer
         intoShooter(),
         new InstantCommand(() -> setShooterRef(0))
@@ -126,9 +126,9 @@ public class InOut extends SubsystemBase {
     // return new InstantCommand(() -> m_intake.set(0.75))
     // .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
     // .andThen(new InstantCommand(() -> m_intake.set(0)));
-    return 
-    this.startEnd(() -> m_intake.set(0.75), () -> m_intake.set(0))
-    .deadlineWith(new WaitUntilCommand(()->isNoteInIntake()).withTimeout(1.5)); // i like this, hopefuly it works
+    return new InstantCommand(() -> m_intake.set(0.75))
+    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    .andThen(new InstantCommand(() -> m_intake.set(0)));
 
   }
 
@@ -175,7 +175,7 @@ public class InOut extends SubsystemBase {
     if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
 
     SmartDashboard.putBoolean("noteState", noteState);
-    SmartDashboard.putNumber("shooter volocity", shooterVelocity(false));
+    SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
   }
   
 }

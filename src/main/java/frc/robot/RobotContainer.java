@@ -64,7 +64,6 @@ public class RobotContainer {
     
     // Configure the button bindings
     configureBindings();
-m_Dashboard.register();
     
   }
   /**
@@ -77,29 +76,29 @@ m_Dashboard.register();
    * {@link JoystickButton}.
    */
   private void configureBindings() {
-    //swerve Drive
-    m_robotDrive.setDefaultCommand(
-      // The left stick controls translation of the robot.
-      // Turning is controlled by the X axis of the right stick.
-     new RunCommand(
-          () -> m_robotDrive.drive(
-              -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kUpDown), OIConstants.kDriveDeadband),
-              -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kLeftRight), OIConstants.kDriveDeadband),
-              -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(RightStick.kLeftRight), OIConstants.kDriveDeadband),
-              true, true),
-          m_robotDrive));
+    // //swerve Drive
+    // m_robotDrive.setDefaultCommand(
+    //   // The left stick controls translation of the robot.
+    //   // Turning is controlled by the X axis of the right stick.
+    //  new RunCommand(
+    //       () -> m_robotDrive.drive(
+    //           -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kUpDown), OIConstants.kDriveDeadband),
+    //           -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kLeftRight), OIConstants.kDriveDeadband),
+    //           -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(RightStick.kLeftRight), OIConstants.kDriveDeadband),
+    //           true, true),
+    //       m_robotDrive));
 
-    if (m_Arm != null && m_operatorGamepad != null) {
-      m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
-      () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
-      ));
-    }
+    // if (m_Arm != null && m_operatorGamepad != null) {
+    //   m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
+    //   () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
+    //   ));
+    // }
 
     
-    new JoystickButton(m_driverGamepad, Button.kLB)
-        .toggleOnTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+    // new JoystickButton(m_driverGamepad, Button.kLB)
+    //     .toggleOnTrue(new RunCommand(
+    //         () -> m_robotDrive.setX(),
+    //         m_robotDrive));
     
     //Intake Comand
     Trigger intakeMaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
@@ -124,8 +123,8 @@ m_Dashboard.register();
     .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOut.kSetpoint)))
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
 
-    new JoystickButton(m_operatorGamepad, Button.kLT)
-    .onTrue(new ShooterAmpOrSpeakerCommand(m_Arm, m_InOut));
+    // new JoystickButton(m_operatorGamepad, Button.kLT)
+    // .onTrue(new ShooterAmpOrSpeakerCommand(m_Arm, m_InOut));
   }
 
   /**

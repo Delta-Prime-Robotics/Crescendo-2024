@@ -89,7 +89,7 @@ public class ArmSubsystem extends SubsystemBase {
     else if(MathUtil.isNear(ArmConstants.kSpeakerPosition, armRotation(),tolerance)){
       return ArmState.SPEAKER;
     }
-    else if(MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(),tolerance)){
+    else if(MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(),tolerance, 0, 1)){
       return ArmState.GROUND;
     }
     else if(MathUtil.isNear(ArmConstants.kErectPosition, armRotation(),tolerance)){
