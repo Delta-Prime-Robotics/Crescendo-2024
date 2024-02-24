@@ -109,8 +109,17 @@ public class ArmSubsystem extends SubsystemBase {
   }
   
   public void armRun(double speed){
-   m_leader.set(speed);
+    //this stops the armRotation untill you try to move backwards
+    if ( (armRotation() < 0.25) || (armRotation() > .96) || speed < 0) {
+      m_leader.set(speed);
+    }
+    else{
+      m_leader.set(0);
+    }
+  // m_leader.set(speed);
    SmartDashboard.putNumber("speed", speed);
+   SmartDashboard.putNumber("Actusl Posotiozdvjbkjdxhv", armRotation());
+
   }
   
   
