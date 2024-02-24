@@ -10,16 +10,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class ArmMoveCommand extends Command {
+public class ArmManualMoveCommand extends Command {
   
   private static final double kForwardScaleFactor = 1.0;
  
   private final ArmSubsystem m_armSubsystem;
   private final DoubleSupplier m_forwardSpeedSupplier;
-  private boolean isHittingInArmMove = false;
 
   /** Creates a new ArcadeDriveCommand. */
-  public ArmMoveCommand(ArmSubsystem armSubsystem, DoubleSupplier forwardSpeedSupplier) {
+  public ArmManualMoveCommand(ArmSubsystem armSubsystem, DoubleSupplier forwardSpeedSupplier) {
     m_armSubsystem = armSubsystem;
     m_forwardSpeedSupplier = forwardSpeedSupplier;
         
@@ -38,11 +37,7 @@ public class ArmMoveCommand extends Command {
   public void execute() {
     // Scale the control values so they're not as sensitive
     double scaledForwardSpeed = m_forwardSpeedSupplier.getAsDouble() * kForwardScaleFactor;
-    
     m_armSubsystem.armRun(scaledForwardSpeed);
-    isHittingInArmMove =! isHittingInArmMove;
-    SmartDashboard.putBoolean("is Hitting in Arm Move", isHittingInArmMove);
-    SmartDashboard.putNumber("forwardSpeed", scaledForwardSpeed);
   }
 
   // Returns true when the command should end.

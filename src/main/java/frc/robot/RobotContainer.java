@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -13,29 +15,27 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Joystick;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.GamePad;
-import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.Dashboard;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.InOut;
-import frc.robot.commands.*;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
-import java.util.List;
-
-import com.fasterxml.jackson.databind.introspect.ConcreteBeanPropertyBase;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.GamePad;
+import frc.robot.Constants.GamePad.Button;
+import frc.robot.Constants.GamePad.LeftStick;
+import frc.robot.Constants.GamePad.RightStick;
+import frc.robot.commands.ArmManualMoveCommand;
+import frc.robot.commands.ShooterAmpOrSpeakerCommand;
+import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.Dashboard;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.InOut;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -63,39 +63,9 @@ public class RobotContainer {
   public RobotContainer() {
     
     // Configure the button bindings
-    configureButtonBindings();
-    configureDefaultCommands();
-    
-    m_Dashboard.register();
+    configureBindings();
     
   }
-  // Configure default commands
-  private void configureDefaultCommands() {
-    m_robotDrive.setDefaultCommand(
-    // The left stick controls translation of the robot.
-    // Turning is controlled by the X axis of the right stick.
-   new RunCommand(
-        () -> m_robotDrive.drive(
-            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.LeftStick.kUpDown), OIConstants.kDriveDeadband),
-            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.LeftStick.kLeftRight), OIConstants.kDriveDeadband),
-            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(Constants.GamePad.RightStick.kLeftRight), OIConstants.kDriveDeadband),
-            true, true),
-        m_robotDrive));
-    
-    //Manual Arm
-    
-    // if (m_Arm != null && m_operatorGamepad != null) {
-    //   m_Arm.setDefaultCommand(new ArmMoveCommand(m_Arm, 
-    //   () -> -m_operatorGamepad.getRawAxis(GamePad.LeftStick.kUpDown)
-    //   ));
-
-    // }
-
-  }
-
-
-
-
   /**
    * Use this method to define your button->command mappings. Buttons can be
    * created by
@@ -105,18 +75,37 @@ public class RobotContainer {
    * passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {
-    new JoystickButton(m_driverGamepad, GamePad.Button.kLB)
-        .toggleOnTrue(new RunCommand(
-            () -> m_robotDrive.setX(),
-            m_robotDrive));
+  private void configureBindings() {
+    // //swerve Drive
+    // m_robotDrive.setDefaultCommand(
+    //   // The left stick controls translation of the robot.
+    //   // Turning is controlled by the X axis of the right stick.
+    //  new RunCommand(
+    //       () -> m_robotDrive.drive(
+    //           -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kUpDown), OIConstants.kDriveDeadband),
+    //           -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kLeftRight), OIConstants.kDriveDeadband),
+    //           -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(RightStick.kLeftRight), OIConstants.kDriveDeadband),
+    //           true, true),
+    //       m_robotDrive));
+
+    // if (m_Arm != null && m_operatorGamepad != null) {
+    //   m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
+    //   () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
+    //   ));
+    // }
+
+    
+    // new JoystickButton(m_driverGamepad, Button.kLB)
+    //     .toggleOnTrue(new RunCommand(
+    //         () -> m_robotDrive.setX(),
+    //         m_robotDrive));
     
     //Intake Comand
-    Trigger intakeMaunalOveride = new JoystickButton(m_operatorGamepad,GamePad.Button.kY);
+    Trigger intakeMaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
 
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kA)
+    new JoystickButton(m_operatorGamepad, Button.kA)
       .onTrue(new RunCommand(
-        () -> m_InOut.intakeNote(1, intakeMaunalOveride.getAsBoolean()), m_InOut
+        () -> m_InOut.intakeNote(0.5, intakeMaunalOveride.getAsBoolean()), m_InOut
       ))
       .onFalse(new InstantCommand(
         () -> m_InOut.intakeNote(0,true), m_InOut
@@ -126,17 +115,16 @@ public class RobotContainer {
     // new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
     // .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
     // .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
-    
-    // //arm command
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
-    // .onTrue(new RunCommand(() -> m_Arm.armRun(0.5), m_Arm))
-    // .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kX)
+
+    new JoystickButton(m_operatorGamepad, Button.kX)
     .onTrue(m_InOut.intoShooter());
 
-    new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
-    .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(m_InOut.kSetpoint)))
+    new JoystickButton(m_operatorGamepad, Button.kB)
+    .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOut.kSetpoint)))
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
+
+    // new JoystickButton(m_operatorGamepad, Button.kLT)
+    // .onTrue(new ShooterAmpOrSpeakerCommand(m_Arm, m_InOut));
   }
 
   /**
