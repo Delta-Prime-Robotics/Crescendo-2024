@@ -168,7 +168,7 @@ public final class Constants {
     //Idle Mode
     public static final IdleMode kArmIdleMode = IdleMode.kBrake;
     //Setpoints in rotations ranging from 0 to 1 and wraping around. 
-    public static final double kAmpPosition = 0.315; 
+    public static final double kAmpPosition = 0.25; 
     public static final double kSpeakerPosition = 0.07;
     public static final double kGroundPosition = 0;
     public static final double kErectPosition = 0.2;
