@@ -74,11 +74,11 @@ public class InOut extends SubsystemBase {
     this.shooterPIDController.setI(kI);
     this.shooterPIDController.setD(kD);
     this.shooterPIDController.setOutputRange(kMinOutput, kMaxOutput);
-    SmartDashboard.putNumber("P Gain", kP);
-    SmartDashboard.putNumber("I Gain", kI);
-    SmartDashboard.putNumber("D Gain", kD);
-    SmartDashboard.putNumber("Feed Forward", kFF);
-    SmartDashboard.putNumber("setpoint", kSetpoint);
+    // SmartDashboard.putNumber("P Gain", kP);
+    // SmartDashboard.putNumber("I Gain", kI);
+    // SmartDashboard.putNumber("D Gain", kD);
+    // SmartDashboard.putNumber("Feed Forward", kFF);
+    // SmartDashboard.putNumber("setpoint", kSetpoint);
    
     //setting CAN ID's for Intake Motor Controler
     m_intake = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
@@ -92,8 +92,9 @@ public class InOut extends SubsystemBase {
    */
   public void setShooterRef(double speed) {
     shooterPIDController.setReference(speed, ControlType.kVelocity);
+    //NO TOUCHY
   }
-
+  
   private static double shooterVelocity() {
     // double velocityInRPM = -m_Encoder.getVelocity();
     // double wheelDiameter = 0.2; 
@@ -102,7 +103,8 @@ public class InOut extends SubsystemBase {
     // // Convert Rotations per Second to Meters per Second
     // double velocityInMPS = rotationsPerSecond * (wheelDiameter * Math.PI);
     // return (inMPS?velocityInMPS:velocityInRPM);
-    return -m_Encoder.getVelocity();
+    return -m_Encoder.getVelocity(); 
+    //NO TOUCHY
   }
 
   //TO-DO
@@ -123,9 +125,6 @@ public class InOut extends SubsystemBase {
   }
   
   public Command intoShooter() {
-    // return new InstantCommand(() -> m_intake.set(0.75))
-    // .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    // .andThen(new InstantCommand(() -> m_intake.set(0)));
     return new InstantCommand(() -> m_intake.set(.75))
     .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
     .andThen(new InstantCommand(() -> m_intake.set(0)));
@@ -139,7 +138,7 @@ public class InOut extends SubsystemBase {
     else if (isNoteInIntake()) {
       setIntakeSpeed(0);
     }
-    else{
+    else {
       setIntakeSpeed(speed);
     }
   }
@@ -157,21 +156,22 @@ public class InOut extends SubsystemBase {
     m_intake.set(speed);
   }
   
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    double p = SmartDashboard.getNumber("P Gain", 0);
-    double i = SmartDashboard.getNumber("I Gain", 0);
-    double d = SmartDashboard.getNumber("D Gain", 0);
-    double ff = SmartDashboard.getNumber("Feed Forward", 0);
-    double setpoint = SmartDashboard.getNumber("setpoint",0);
+    // double p = SmartDashboard.getNumber("P Gain", 0);
+    // double i = SmartDashboard.getNumber("I Gain", 0);
+    // double d = SmartDashboard.getNumber("D Gain", 0);
+    // double ff = SmartDashboard.getNumber("Feed Forward", 0);
+    // double setpoint = SmartDashboard.getNumber("setpoint",0);
     
-    // if PID coefficients on SmartDashboard have changed, write new values to controller
-    if((p != kP)) { shooterPIDController.setP(p); kP = p; }
-    if((i != kI)) { shooterPIDController.setI(i); kI = i; }
-    if((d != kD)) { shooterPIDController.setD(d); kD = d; }
-    if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
-    if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
+    // // if PID coefficients on SmartDashboard have changed, write new values to controller
+    // if((p != kP)) { shooterPIDController.setP(p); kP = p; }
+    // if((i != kI)) { shooterPIDController.setI(i); kI = i; }
+    // if((d != kD)) { shooterPIDController.setD(d); kD = d; }
+    // if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
+    // if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
 
     SmartDashboard.putBoolean("noteState", noteState);
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -30,6 +31,7 @@ import frc.robot.Constants.GamePad.Button;
 import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
 import frc.robot.commands.ArmManualMoveCommand;
+import frc.robot.commands.IntakeJoystickCommand;
 import frc.robot.commands.ShooterAmpOrSpeakerCommand;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
@@ -76,7 +78,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureBindings() {
-    // //swerve Drive
+        // //swerve Drive
     m_robotDrive.setDefaultCommand(
       // The left stick controls translation of the robot.
       // Turning is controlled by the X axis of the right stick.
@@ -90,19 +92,19 @@ public class RobotContainer {
       
       // new JoystickButton(m_operatorGamepad, Button.kRB)
       // .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading()));
-
+    
     if (m_Arm != null && m_operatorGamepad != null) {
       m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
       () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
       ));
-
-    // if (m_InOut != null && m_operatorGamepad != null) {
-    //     m_InOut.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
-    //     () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
-    //     ));
     }
 
-    
+    if (m_InOut != null && m_operatorGamepad != null) {
+      m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
+      () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05)
+      ));
+    }
+
     // new JoystickButton(m_driverGamepad, Button.kLB)
     //     .toggleOnTrue(new RunCommand(
     //         () -> m_robotDrive.setX(),
@@ -118,11 +120,6 @@ public class RobotContainer {
       .onFalse(new InstantCommand(
         () -> m_InOut.intakeNote(0,true), m_InOut
       ));
-
-    //Shooter Comand
-    // new JoystickButton(m_operatorGamepad, GamePad.Button.kB)
-    // .onTrue(new RunCommand(() -> m_InOut.setShooter(1), m_InOut))
-    // .onFalse(new InstantCommand(() -> m_InOut.setShooter(0), m_InOut));
 
     new JoystickButton(m_operatorGamepad, Button.kX)
     .onTrue(m_InOut.intoShooter());
