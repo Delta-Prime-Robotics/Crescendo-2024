@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -110,24 +111,25 @@ public class InOut extends SubsystemBase {
   //TO-DO
   //GO THROUGH THIS one by one to test if it works
   public Command shootIntoSpeaker(){
-    final double kspeed = 300; //Speed is in RPMs
+    final double kspeed = 2900; //Speed is in RPMs
     
-    SequentialCommandGroup sequence = new SequentialCommandGroup();
-      sequence.addCommands(
-        new InstantCommand(() -> setShooterRef(kspeed)) 
-        //if this doesnt work maybe set to RunCommand, it might need to be updating multible times
-        .deadlineWith(new WaitUntilCommand(() -> shooterVelocity() == kspeed)),
-        //This might not work because the lamda is pointing to a boolean and is not a boolen sublyer
-        intoShooter(),
-        new InstantCommand(() -> setShooterRef(0))
-      );
-    return sequence;
+    SequentialCommandGroup group = new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+          new WaitCommand(1), 
+          new InstantCommand(() -> setShooterRef(kspeed))
+      ),
+      intoShooter(),
+      new InstantCommand(() -> setShooterRef(0))
+      .alongWith(new InstantCommand(()->noteStateFalse()),
+      new InstantCommand(() -> m_intake.set(0)))
+    );
+    return group;
   }
   
   public Command intoShooter() {
-    return new InstantCommand(() -> m_intake.set(.75))
-    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    .andThen(new InstantCommand(() -> m_intake.set(0)));
+    return new InstantCommand(() -> m_intake.set(1))
+    .andThen(new WaitCommand(0.5));// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    //.andThen(new InstantCommand(() -> m_intake.set(0)));
   }
 
   //if manual Overide is True it will ignore The Beam Break
@@ -147,9 +149,13 @@ public class InOut extends SubsystemBase {
   public boolean isNoteInIntake() {
     //when the BeamBreak is false there is a note in the Intake
     if (bbInput.get() == false) {
-      noteState =! noteState;
+      noteState = true;
     }
     return noteState;
+  }
+
+  public void noteStateFalse() {
+    noteState = false;
   }
 
   public void setIntakeSpeed(double speed) {
