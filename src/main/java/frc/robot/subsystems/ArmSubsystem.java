@@ -116,10 +116,6 @@ public class ArmSubsystem extends SubsystemBase {
     else{
       m_leader.set(0);
     }
-  // m_leader.set(speed);
-   SmartDashboard.putNumber("speed", speed);
-   SmartDashboard.putNumber("Actusl Posotiozdvjbkjdxhv", armRotation());
-
   }
   
   
