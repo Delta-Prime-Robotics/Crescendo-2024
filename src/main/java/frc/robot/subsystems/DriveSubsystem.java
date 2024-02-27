@@ -81,8 +81,8 @@ public class DriveSubsystem extends SubsystemBase {
       DriverStation.reportError("Error instantiating navX MSP: " + ex.getMessage(), true);
     }
     
-    //field
-    SmartDashboard.putData("Field", m_Field);
+    // //field
+    // SmartDashboard.putData("Field", m_Field);
   }
 
   @Override
@@ -97,8 +97,8 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
     
-    //robot postion on field
-    m_Field.setRobotPose(getPose());
+    // //robot postion on field
+    // m_Field.setRobotPose(getPose());
   }
 
   /**

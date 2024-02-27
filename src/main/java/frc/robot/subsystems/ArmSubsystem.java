@@ -53,13 +53,13 @@ public class ArmSubsystem extends SubsystemBase {
     // //Encoder
     m_AbsoluteEncoder = this.m_leader.getAbsoluteEncoder(Type.kDutyCycle);
 
-    // ArmPID and FeedForward
-    m_pidControler = this.m_leader.getPIDController();
-    m_pidControler.setP(0);
-    m_pidControler.setI(0);
-    m_pidControler.setD(0);
-    m_pidControler.setFF(0);
-    m_pidControler.setFeedbackDevice(m_AbsoluteEncoder);
+    // // ArmPID and FeedForward
+    // m_pidControler = this.m_leader.getPIDController();
+    // m_pidControler.setP(0);
+    // m_pidControler.setI(0);
+    // m_pidControler.setD(0);
+    // m_pidControler.setFF(0);
+    // m_pidControler.setFeedbackDevice(m_AbsoluteEncoder);
   }
 
   public static enum ArmState {

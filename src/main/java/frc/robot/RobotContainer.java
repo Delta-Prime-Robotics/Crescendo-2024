@@ -113,21 +113,22 @@ public class RobotContainer {
     //Intake Comand
     Trigger MaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
 
-    new JoystickButton(m_operatorGamepad, Button.kA)
-      .onTrue(new RunCommand(
-        () -> m_InOut.intakeNote(0.75, MaunalOveride.getAsBoolean()), m_InOut
-      ))
-      .onFalse(new InstantCommand(
-        () -> m_InOut.intakeNote(0,true), m_InOut
-      ));
-
     new JoystickButton(m_operatorGamepad, Button.kLT)
-    .onTrue(m_InOut.shootIntoSpeaker());
+      .onTrue(new RunCommand(
+        () -> m_InOut.intakeNote(0.9, MaunalOveride.getAsBoolean()), m_InOut
+      ))
+      .onFalse(new InstantCommand( ()->m_InOut.intakeStop()));
+
+    // new JoystickButton(m_operatorGamepad, Button.kRT)
+    // .onTrue(m_InOut.shootIntoSpeaker());
     //.onFalse(new InstantCommand(() -> m_InOut.noteStateFalse()));
 
     new JoystickButton(m_operatorGamepad, Button.kB)
     .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOut.kSetpoint)))
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
+
+    new JoystickButton(m_operatorGamepad, Button.kX)
+    .onTrue(m_InOut.intoShooter());
 
     // new JoystickButton(m_operatorGamepad, Button.kLT)
     // .onTrue(new ShooterAmpOrSpeakerCommand(m_Arm, m_InOut));

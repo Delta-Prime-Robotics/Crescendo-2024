@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -128,8 +129,8 @@ public class InOut extends SubsystemBase {
   
   public Command intoShooter() {
     return new InstantCommand(() -> m_intake.set(1))
-    .andThen(new WaitCommand(0.5));// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    //.andThen(new InstantCommand(() -> m_intake.set(0)));
+    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    .andThen(new InstantCommand(() -> m_intake.set(0)));
   }
 
   //if manual Overide is True it will ignore The Beam Break
@@ -144,6 +145,13 @@ public class InOut extends SubsystemBase {
       setIntakeSpeed(speed);
     }
   }
+
+  // public Command intakeNoteWithReverse(){
+  //   return new InstantCommand(() -> intakeStop())
+  //   .andThen(new InstantCommand(()->setIntakeSpeed(0.1)))
+  //   .andThen(new WaitCommand(0.1))
+  //   .andThen(new InstantCommand(() -> intakeStop()));
+  // }
 
   //Note detector
   public boolean isNoteInIntake() {
@@ -160,6 +168,10 @@ public class InOut extends SubsystemBase {
 
   public void setIntakeSpeed(double speed) {
     m_intake.set(speed);
+  }
+
+  public void intakeStop(){
+    m_intake.set(0);
   }
   
 
