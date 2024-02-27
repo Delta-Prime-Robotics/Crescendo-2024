@@ -115,7 +115,7 @@ public class RobotContainer {
 
     new JoystickButton(m_operatorGamepad, Button.kA)
       .onTrue(new RunCommand(
-        () -> m_InOut.intakeNote(0.75, MaunalOveride.getAsBoolean()), m_InOut
+        () -> m_InOut.intakeNote(0.9, MaunalOveride.getAsBoolean()), m_InOut
       ))
       .onFalse(new InstantCommand(
         () -> m_InOut.intakeNote(0,true), m_InOut

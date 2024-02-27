@@ -132,26 +132,30 @@ public class InOut extends SubsystemBase {
     //.andThen(new InstantCommand(() -> m_intake.set(0)));
   }
 
+  public Command loadaNote(BooleanSupplier notestate)
+  {
+    final double kspeed = 2900;
+    return new ParallelDeadlineGroup(
+          new WaitUntilCommand(notestate), 
+          new InstantCommand(() -> setShooterRef(kspeed))
+          );
+  }
+
   //if manual Overide is True it will ignore The Beam Break
   public void intakeNote(double speed, boolean maunalOveride){
-    if (maunalOveride){
-      setIntakeSpeed(speed);
-    }
-    else if (isNoteInIntake()) {
+      if (isNoteInIntake()) {
       setIntakeSpeed(0);
     }
     else {
       setIntakeSpeed(speed);
     }
+
   }
 
   //Note detector
   public boolean isNoteInIntake() {
     //when the BeamBreak is false there is a note in the Intake
-    if (bbInput.get() == false) {
-      noteState = true;
-    }
-    return noteState;
+    return !bbInput.get();
   }
 
   public void noteStateFalse() {

@@ -81,7 +81,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
-  public static Supplier<ArmState> armStateLogic = () -> {
+  public Supplier<ArmState> armStateLogic = () -> {
     double tolerance = 0.005;
     if(MathUtil.isNear(ArmConstants.kAmpPosition, armRotation(),tolerance)){
       return ArmState.AMP;
@@ -104,7 +104,7 @@ public class ArmSubsystem extends SubsystemBase {
   
   /**Postion of the Arm in rotations. 
    * 0 to 1, wraps back to zero*/
-  public static double armRotation() {
+  public double armRotation() {
     return m_AbsoluteEncoder.getPosition();
   }
   
@@ -118,14 +118,21 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
   
-  
-  public Command goToAmp() {
-    return this.run(()-> setRef(ArmConstants.kAmpPosition));
-  }
+  public boolean armAngleInSpeakerRange()
+  {
+    // These need to be constant values that we can update
+    return ((this.armRotation() > .12) &&
+            (this.armRotation() < .18));
 
-  public Command goToSpeaker() {
-    return this.run(()-> setRef(ArmConstants.kSpeakerPosition));
   }
+  
+//  public Command goToAmp() {
+//  return this.run(()-> setRef(ArmConstants.kAmpPosition));
+// }
+
+//  public Command goToSpeaker() {
+//    return this.run(()-> setRef(ArmConstants.kSpeakerPosition));
+//  }
   
   @Override
   public void periodic() {
