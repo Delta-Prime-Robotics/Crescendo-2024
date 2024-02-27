@@ -153,7 +153,7 @@ public class InOut extends SubsystemBase {
   }
 
   //Note detector
-  public boolean isNoteInIntake() {
+  public Boolean isNoteInIntake() {
     //when the BeamBreak is false there is a note in the Intake
     return !bbInput.get();
   }

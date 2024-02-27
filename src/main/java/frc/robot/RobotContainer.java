@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -112,13 +113,14 @@ public class RobotContainer {
     
     //Intake Comand
     Trigger MaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
+    BooleanSupplier IsInIntake = () -> m_InOut.isNoteInIntake();
 
     new JoystickButton(m_operatorGamepad, Button.kA)
       .onTrue(new RunCommand(
-        () -> m_InOut.intakeNote(0.9, MaunalOveride.getAsBoolean()), m_InOut
+        () -> m_InOut.loadaNote(IsInIntake), m_InOut
       ))
       .onFalse(new InstantCommand(
-        () -> m_InOut.intakeNote(0,true), m_InOut
+        () -> m_InOut.setIntakeSpeed(0), m_InOut
       ));
 
     new JoystickButton(m_operatorGamepad, Button.kLT)
