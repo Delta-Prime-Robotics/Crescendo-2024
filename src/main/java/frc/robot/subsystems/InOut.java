@@ -134,10 +134,10 @@ public class InOut extends SubsystemBase {
 
   public Command loadaNote(BooleanSupplier notestate)
   {
-    final double kspeed = 2900;
+    final double kspeed = .9;
     return new ParallelDeadlineGroup(
           new WaitUntilCommand(notestate), 
-          new InstantCommand(() -> setShooterRef(kspeed))
+          new InstantCommand(() -> setIntakeSpeed(kspeed))
           );
   }
 
