@@ -90,32 +90,29 @@ public class RobotContainer {
               -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(RightStick.kLeftRight), OIConstants.kDriveDeadband),
               true, true),
           m_robotDrive));
-      
-      // new JoystickButton(m_operatorGamepad, Button.kRB)
-      // .onTrue(new InstantCommand(() -> m_robotDrive.zeroHeading()));
+      if (m_Arm != null && m_operatorGamepad != null) {
+          m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
+          () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
+          ));
+        }
     
-    if (m_Arm != null && m_operatorGamepad != null) {
-      m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
-      () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
-      ));
-    }
+      if (m_InOut != null && m_operatorGamepad != null) {
+          m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
+          () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
+          () -> m_operatorGamepad.getRawButton(Button.kX) || m_operatorGamepad.getRawButton(Button.kA)
+          ));
+        }
 
-    if (m_InOut != null && m_operatorGamepad != null) {
-      m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
-      () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05)
-      ));
-    }
-
-    // new JoystickButton(m_driverGamepad, Button.kLB)
-    //     .toggleOnTrue(new RunCommand(
-    //         () -> m_robotDrive.setX(),
-    //         m_robotDrive));
+     new JoystickButton(m_driverGamepad, Button.kLB)
+         .onTrue(new InstantCommand(
+            () -> m_robotDrive.zeroHeading(),
+            m_robotDrive));
     
     //Intake Comand
     Trigger MaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
     BooleanSupplier IsInIntake = () -> m_InOut.isNoteInIntake();
 
-    new JoystickButton(m_operatorGamepad, Button.kA)
+      new JoystickButton(m_operatorGamepad, Button.kA)
       .onTrue(new RunCommand(
         () -> m_InOut.loadaNote(IsInIntake), m_InOut
       ))
@@ -126,6 +123,9 @@ public class RobotContainer {
     new JoystickButton(m_operatorGamepad, Button.kLT)
     .onTrue(m_InOut.shootIntoSpeaker());
     //.onFalse(new InstantCommand(() -> m_InOut.noteStateFalse()));
+    
+    new JoystickButton(m_operatorGamepad, Button.kX)
+    .onTrue(m_InOut.intoShooter());
 
     new JoystickButton(m_operatorGamepad, Button.kB)
     .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOut.kSetpoint)))
@@ -133,6 +133,7 @@ public class RobotContainer {
 
     // new JoystickButton(m_operatorGamepad, Button.kLT)
     // .onTrue(new ShooterAmpOrSpeakerCommand(m_Arm, m_InOut));
+
   }
 
   /**

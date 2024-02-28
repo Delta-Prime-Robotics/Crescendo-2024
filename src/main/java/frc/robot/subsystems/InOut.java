@@ -119,17 +119,14 @@ public class InOut extends SubsystemBase {
           new InstantCommand(() -> setShooterRef(kspeed))
       ),
       intoShooter(),
-      new InstantCommand(() -> setShooterRef(0))
-      .alongWith(new InstantCommand(()->noteStateFalse()),
-      new InstantCommand(() -> m_intake.set(0)))
-    );
+      new InstantCommand(() -> setShooterRef(0)));
     return group;
   }
   
   public Command intoShooter() {
     return new InstantCommand(() -> m_intake.set(1))
-    .andThen(new WaitCommand(0.5));// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    //.andThen(new InstantCommand(() -> m_intake.set(0)));
+    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    .andThen(new InstantCommand(() -> m_intake.set(0)));
   }
 
   public Command loadaNote(BooleanSupplier notestate)
