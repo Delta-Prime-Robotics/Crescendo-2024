@@ -110,7 +110,7 @@ public class RobotContainer {
     
     //Intake Comand
     Trigger MaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
-    BooleanSupplier IsInIntake = () -> m_InOut.isNoteInIntake();
+    BooleanSupplier IsInIntake = () -> !m_InOut.isNoteInIntake();
 
       new JoystickButton(m_operatorGamepad, Button.kA)
       .onTrue(new RunCommand(
