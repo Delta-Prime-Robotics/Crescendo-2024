@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Rotations;
-
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
@@ -16,13 +13,10 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
-import edu.wpi.first.units.*;
 import edu.wpi.first.math.MathUtil;
-import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.NeoMotorConstants;
@@ -118,6 +112,22 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
   
+  public void getArmInPositionSpeaker()
+  {
+    if (armAngleInSpeakerRange())
+    {
+        m_leader.set(0);
+    }
+    else
+    {
+      double speed = .3;
+      if ( this.armRotation() > .18 )
+        speed *= -1.0;
+
+      m_leader.set(speed);
+    }
+  }
+
   public boolean armAngleInSpeakerRange()
   {
     // These need to be constant values that we can update

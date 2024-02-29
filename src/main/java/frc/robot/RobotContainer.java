@@ -131,8 +131,9 @@ public class RobotContainer {
     .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOut.kSetpoint)))
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
 
-    // new JoystickButton(m_operatorGamepad, Button.kLT)
-    // .onTrue(new ShooterAmpOrSpeakerCommand(m_Arm, m_InOut));
+    new JoystickButton(m_operatorGamepad, Button.kRT)
+      .onTrue(new InstantCommand( () -> m_Arm.getArmInPositionSpeaker(), m_Arm))
+      .onFalse(new RunCommand( () -> m_Arm.armRun(0), m_Arm));
 
   }
 
