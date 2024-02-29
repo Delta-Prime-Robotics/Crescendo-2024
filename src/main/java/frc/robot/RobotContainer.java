@@ -133,7 +133,7 @@ public class RobotContainer {
 
     new JoystickButton(m_operatorGamepad, Button.kRT)
       .onTrue(new RunCommand( () -> m_Arm.getArmInPositionSpeaker(), m_Arm))
-      .onFalse(new RunCommand( () -> m_Arm.armRun(0), m_Arm));
+      .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
 
   }
 
