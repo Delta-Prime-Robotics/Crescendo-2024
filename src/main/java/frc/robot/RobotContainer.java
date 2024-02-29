@@ -110,11 +110,11 @@ public class RobotContainer {
     
     //Intake Comand
     Trigger MaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
-    BooleanSupplier IsInIntake = () -> !m_InOut.isNoteInIntake();
+    BooleanSupplier IsInIntake = () -> m_InOut.mbeambreakintake;
 
       new JoystickButton(m_operatorGamepad, Button.kA)
       .onTrue(new RunCommand(
-        () -> m_InOut.loadaNote(IsInIntake), m_InOut
+        () -> m_InOut.StartIntake(IsInIntake), m_InOut
       ))
       .onFalse(new InstantCommand(
         () -> m_InOut.setIntakeSpeed(0), m_InOut
@@ -143,6 +143,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    
     
     // Create config for trajectory
     TrajectoryConfig config = new TrajectoryConfig(

@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -134,13 +135,20 @@ public class InOut extends SubsystemBase {
     final double kspeed = .9;
     return new ParallelDeadlineGroup(
           new WaitUntilCommand(notestate), 
-          new InstantCommand(() -> setIntakeSpeed(kspeed))
+          new RunCommand(() -> this.intakeNote(.9, notestate))
           );
   }
+public Command StartIntake(BooleanSupplier sup)
+{
+  mbeambreakintake = false;
+  return new RunCommand(() -> intakeNote(.9, sup),this);
+}
 
+public boolean mbeambreakintake = false;
   //if manual Overide is True it will ignore The Beam Break
-  public void intakeNote(double speed, boolean maunalOveride){
-      if (isNoteInIntake()) {
+  public void intakeNote(double speed, BooleanSupplier maunalOveride){
+      if (isNoteInIntake() || !maunalOveride.getAsBoolean()) {
+      mbeambreakintake = true;
       setIntakeSpeed(0);
     }
     else {
