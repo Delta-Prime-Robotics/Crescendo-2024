@@ -138,33 +138,29 @@ public class InOut extends SubsystemBase {
           new RunCommand(() -> this.intakeNote(.9, notestate))
           );
   }
+
 public Command StartIntake(BooleanSupplier sup)
 {
   mbeambreakintake = false;
-  return new RunCommand(() -> intakeNote(.9, sup),this);
+  return new RunCommand(() -> intakeNote(.9, sup), this);
 }
 
 public boolean mbeambreakintake = false;
   //if manual Overide is True it will ignore The Beam Break
-  public void intakeNote(double speed, BooleanSupplier maunalOveride){
-      if (isNoteInIntake() || !maunalOveride.getAsBoolean()) {
+public void intakeNote(double speed, BooleanSupplier maunalOveride){
+    if (isNoteInIntake() || maunalOveride.getAsBoolean()) {
       mbeambreakintake = true;
       setIntakeSpeed(0);
     }
     else {
       setIntakeSpeed(speed);
     }
-
-  }
+}
 
   //Note detector
   public Boolean isNoteInIntake() {
     //when the BeamBreak is false there is a note in the Intake
     return !bbInput.get();
-  }
-
-  public void noteStateFalse() {
-    noteState = false;
   }
 
   public void setIntakeSpeed(double speed) {

@@ -90,18 +90,19 @@ public class RobotContainer {
               -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(RightStick.kLeftRight), OIConstants.kDriveDeadband),
               true, true),
           m_robotDrive));
+      
       if (m_Arm != null && m_operatorGamepad != null) {
           m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
           () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
-          ));
-        }
+        ));
+      }
     
       if (m_InOut != null && m_operatorGamepad != null) {
           m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
           () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
           () -> m_operatorGamepad.getRawButton(Button.kX) || m_operatorGamepad.getRawButton(Button.kA)
           ));
-        }
+      }
 
      new JoystickButton(m_driverGamepad, Button.kLB)
          .onTrue(new InstantCommand(
@@ -110,12 +111,12 @@ public class RobotContainer {
     
     //Intake Comand
     Trigger MaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
+    
     BooleanSupplier IsInIntake = () -> m_InOut.mbeambreakintake;
 
       new JoystickButton(m_operatorGamepad, Button.kA)
-      .onTrue(new RunCommand(
-        () -> m_InOut.StartIntake(IsInIntake), m_InOut
-      ))
+      .onTrue(m_InOut.StartIntake(IsInIntake)
+      )
       .onFalse(new InstantCommand(
         () -> m_InOut.setIntakeSpeed(0), m_InOut
       ));
@@ -132,9 +133,8 @@ public class RobotContainer {
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
 
     new JoystickButton(m_operatorGamepad, Button.kRT)
-      .onTrue(new RunCommand( () -> m_Arm.getArmInPositionSpeaker(), m_Arm))
+      .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
       .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
-
   }
 
   /**
@@ -143,8 +143,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    
-    
     // Create config for trajectory
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
@@ -157,7 +155,7 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        List.of(new Translation2d(1, 0), new Translation2d(2, 0)),
         // End 3 meters straight ahead of where we started, facing forward
         new Pose2d(3, 0, new Rotation2d(0)),
         config);
