@@ -28,7 +28,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_follower; //right arm
   private static SparkAbsoluteEncoder m_AbsoluteEncoder;
   private static SparkPIDController m_pidControler;
-  
+  private static double kMaxSpeakerAngle = 0.08;
+  private static double kMinSpeakerAngle = 0.045;
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
     m_leader = new CANSparkMax(ArmConstants.kArmLeftCanId, MotorType.kBrushless);
@@ -121,7 +122,7 @@ public class ArmSubsystem extends SubsystemBase {
     else
     {
       double speed = .3;
-      if ( this.armRotation() > .09 )
+      if ( this.armRotation() > kMaxSpeakerAngle)
         speed *= -1.0;
 
       m_leader.set(speed);
@@ -131,8 +132,8 @@ public class ArmSubsystem extends SubsystemBase {
   public boolean armAngleInSpeakerRange()
   {
     // These need to be constant values that we can update
-    return ((this.armRotation() > 0.045) &&
-            (this.armRotation() < 0.09));
+    return ((this.armRotation() > kMinSpeakerAngle) &&
+            (this.armRotation() < kMaxSpeakerAngle));
 
   }
   

@@ -22,7 +22,7 @@ import frc.robot.subsystems.DriveSubsystem;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-
+  public static boolean isInAuto;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -64,6 +64,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -75,6 +76,7 @@ public class Robot extends TimedRobot {
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
+      m_robotContainer.isAutonomous = true;
     }
   }
 
@@ -90,6 +92,7 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+      m_robotContainer.isAutonomous = false;
     }
   }
 
