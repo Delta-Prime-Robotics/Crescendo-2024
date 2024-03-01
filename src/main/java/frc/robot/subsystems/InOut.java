@@ -126,7 +126,7 @@ public class InOut extends SubsystemBase {
   
   public Command intoShooter() {
     return new InstantCommand(() -> m_intake.set(1))
-    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
     .andThen(new InstantCommand(() -> m_intake.set(0)));
   }
 

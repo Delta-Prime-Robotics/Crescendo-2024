@@ -121,7 +121,7 @@ public class ArmSubsystem extends SubsystemBase {
     else
     {
       double speed = .3;
-      if ( this.armRotation() > .18 )
+      if ( this.armRotation() > .09 )
         speed *= -1.0;
 
       m_leader.set(speed);
@@ -131,8 +131,8 @@ public class ArmSubsystem extends SubsystemBase {
   public boolean armAngleInSpeakerRange()
   {
     // These need to be constant values that we can update
-    return ((this.armRotation() > .12) &&
-            (this.armRotation() < .18));
+    return ((this.armRotation() > 0.045) &&
+            (this.armRotation() < 0.09));
 
   }
   

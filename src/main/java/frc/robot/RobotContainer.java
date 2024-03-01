@@ -100,7 +100,9 @@ public class RobotContainer {
       if (m_InOut != null && m_operatorGamepad != null) {
           m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
           () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
-          () -> m_operatorGamepad.getRawButton(Button.kX) || m_operatorGamepad.getRawButton(Button.kA)
+          () -> m_operatorGamepad.getRawButton(Button.kX) || 
+          m_operatorGamepad.getRawButton(Button.kA) ||
+          m_operatorGamepad.getRawButton(Button.kLT)
           ));
       }
 
@@ -155,9 +157,9 @@ public class RobotContainer {
         // Start at the origin facing the +X direction
         new Pose2d(0, 0, new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 0), new Translation2d(2, 0)),
+        List.of(new Translation2d(1, 0), new Translation2d(2.5, 0)),
         // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
+        new Pose2d(4, 0, new Rotation2d(0)),
         config);
 
     var thetaController = new ProfiledPIDController(
