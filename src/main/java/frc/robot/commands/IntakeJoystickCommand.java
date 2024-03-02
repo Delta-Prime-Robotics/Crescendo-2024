@@ -38,8 +38,8 @@ public class IntakeJoystickCommand extends Command {
   @Override
   public void execute() {
     if (m_BooleanSupplier.getAsBoolean()) {
-      //this disables the default command and uses buttons
-      // do not put anything in here
+    //   //this disables the default command and uses buttons
+    //   // do not put anything in here
     }
     else {
     m_InOut.setIntakeSpeed(m_forwardSpeedSupplier.getAsDouble());

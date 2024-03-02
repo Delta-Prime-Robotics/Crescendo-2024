@@ -105,11 +105,14 @@ public class RobotContainer {
       if (m_InOut != null && m_operatorGamepad != null) {
           m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
           () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
-          () -> m_operatorGamepad.getRawButton(Button.kX) || 
-          m_operatorGamepad.getRawButton(Button.kA) ||
-          m_operatorGamepad.getRawButton(Button.kLT) ||
+          () -> 
+          // m_operatorGamepad.getRawButton(Button.kX) || 
+          // m_operatorGamepad.getRawButton(Button.kA) ||
+          // m_operatorGamepad.getRawButton(Button.kLT) 
+          // ||
           isAutonomous
           ));
+        
       }
 
      new JoystickButton(m_driverGamepad, Button.kLB)

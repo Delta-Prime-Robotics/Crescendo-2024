@@ -26,7 +26,7 @@ public class Dashboard extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Get yaw value", DriveSubsystem.m_navx.getAngle());
     SmartDashboard.putNumber("Get Heading", m_Drive.getHeading());
-    SmartDashboard.putBoolean("Note In Intake", InOut.bbInput.get());
+    SmartDashboard.putBoolean("Note In Intake", m_InOut.isNoteInIntake());
 
   }
 

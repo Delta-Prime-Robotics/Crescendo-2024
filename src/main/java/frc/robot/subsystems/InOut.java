@@ -160,7 +160,8 @@ public void intakeNote(double speed, BooleanSupplier maunalOveride){
   //Note detector
   public Boolean isNoteInIntake() {
     //when the BeamBreak is false there is a note in the Intake
-    return !bbInput.get();
+    return false;
+    //!bbInput.get();
   }
 
   public void setIntakeSpeed(double speed) {
