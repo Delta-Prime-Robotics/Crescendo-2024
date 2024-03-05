@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -119,43 +120,48 @@ public class InOut extends SubsystemBase {
           new InstantCommand(() -> setShooterRef(kspeed))
       ),
       intoShooter(),
-      new InstantCommand(() -> setShooterRef(0))
-      .alongWith(new InstantCommand(()->noteStateFalse()),
-      new InstantCommand(() -> m_intake.set(0)))
-    );
+      new InstantCommand(() -> setShooterRef(0)));
     return group;
   }
   
   public Command intoShooter() {
     return new InstantCommand(() -> m_intake.set(1))
-    .andThen(new WaitCommand(0.5));// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    //.andThen(new InstantCommand(() -> m_intake.set(0)));
+    .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    .andThen(new InstantCommand(() -> m_intake.set(0)));
   }
 
+  public Command loadaNote(BooleanSupplier notestate)
+  {
+    final double kspeed = .9;
+    return new ParallelDeadlineGroup(
+          new WaitUntilCommand(notestate), 
+          new RunCommand(() -> this.intakeNote(.9, notestate))
+          );
+  }
+
+public Command StartIntake(BooleanSupplier sup)
+{
+  mbeambreakintake = false;
+  return new RunCommand(() -> intakeNote(.9, sup), this);
+}
+
+public boolean mbeambreakintake = false;
   //if manual Overide is True it will ignore The Beam Break
-  public void intakeNote(double speed, boolean maunalOveride){
-    if (maunalOveride){
-      setIntakeSpeed(speed);
-    }
-    else if (isNoteInIntake()) {
+public void intakeNote(double speed, BooleanSupplier maunalOveride){
+    if (isNoteInIntake() || maunalOveride.getAsBoolean()) {
+      mbeambreakintake = true;
       setIntakeSpeed(0);
     }
     else {
       setIntakeSpeed(speed);
     }
-  }
+}
 
   //Note detector
-  public boolean isNoteInIntake() {
+  public Boolean isNoteInIntake() {
     //when the BeamBreak is false there is a note in the Intake
-    if (bbInput.get() == false) {
-      noteState = true;
-    }
-    return noteState;
-  }
-
-  public void noteStateFalse() {
-    noteState = false;
+    return false;
+    //!bbInput.get();
   }
 
   public void setIntakeSpeed(double speed) {

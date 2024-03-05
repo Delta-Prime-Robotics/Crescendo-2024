@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,11 +16,13 @@ public class IntakeJoystickCommand extends Command {
  
   private final InOut m_InOut;
   private final DoubleSupplier m_forwardSpeedSupplier;
+  private final BooleanSupplier m_BooleanSupplier;
 
   /** Creates a new ArcadeDriveCommand. */
-  public IntakeJoystickCommand(InOut inOut, DoubleSupplier forwardSpeedSupplier) {
+  public IntakeJoystickCommand(InOut inOut, DoubleSupplier forwardSpeedSupplier, BooleanSupplier disableJoystick) {
     m_InOut = inOut;
     m_forwardSpeedSupplier = forwardSpeedSupplier;
+    m_BooleanSupplier = disableJoystick;
         
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_InOut);
@@ -34,9 +37,13 @@ public class IntakeJoystickCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // Scale the control values so they're not as sensitive
-    //double scaledForwardSpeed = m_forwardSpeedSupplier.getAsDouble() * kForwardScaleFactor;
+    if (m_BooleanSupplier.getAsBoolean()) {
+    //   //this disables the default command and uses buttons
+    //   // do not put anything in here
+    }
+    else {
     m_InOut.setIntakeSpeed(m_forwardSpeedSupplier.getAsDouble());
+    }
   }
 
   // Returns true when the command should end.

@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Rotations;
-
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkMax;
@@ -16,13 +13,10 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
-import edu.wpi.first.units.*;
 import edu.wpi.first.math.MathUtil;
-import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.NeoMotorConstants;
@@ -34,7 +28,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_follower; //right arm
   private static SparkAbsoluteEncoder m_AbsoluteEncoder;
   private static SparkPIDController m_pidControler;
-  
+  private static double kMaxSpeakerAngle = 0.08;
+  private static double kMinSpeakerAngle = 0.045;
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
     m_leader = new CANSparkMax(ArmConstants.kArmLeftCanId, MotorType.kBrushless);
@@ -81,7 +76,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
-  public static Supplier<ArmState> armStateLogic = () -> {
+  public Supplier<ArmState> armStateLogic = () -> {
     double tolerance = 0.005;
     if(MathUtil.isNear(ArmConstants.kAmpPosition, armRotation(),tolerance)){
       return ArmState.AMP;
@@ -104,7 +99,7 @@ public class ArmSubsystem extends SubsystemBase {
   
   /**Postion of the Arm in rotations. 
    * 0 to 1, wraps back to zero*/
-  public static double armRotation() {
+  public double armRotation() {
     return m_AbsoluteEncoder.getPosition();
   }
   
@@ -118,14 +113,37 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
   
-  
-  public Command goToAmp() {
-    return this.run(()-> setRef(ArmConstants.kAmpPosition));
+  public void getArmInPositionSpeaker()
+  {
+    if (armAngleInSpeakerRange())
+    {
+        m_leader.set(0);
+    }
+    else
+    {
+      double speed = .3;
+      if ( this.armRotation() > kMaxSpeakerAngle)
+        speed *= -1.0;
+
+      m_leader.set(speed);
+    }
   }
 
-  public Command goToSpeaker() {
-    return this.run(()-> setRef(ArmConstants.kSpeakerPosition));
+  public boolean armAngleInSpeakerRange()
+  {
+    // These need to be constant values that we can update
+    return ((this.armRotation() > kMinSpeakerAngle) &&
+            (this.armRotation() < kMaxSpeakerAngle));
+
   }
+  
+//  public Command goToAmp() {
+//  return this.run(()-> setRef(ArmConstants.kAmpPosition));
+// }
+
+//  public Command goToSpeaker() {
+//    return this.run(()-> setRef(ArmConstants.kSpeakerPosition));
+//  }
   
   @Override
   public void periodic() {
