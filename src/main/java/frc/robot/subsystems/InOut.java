@@ -126,42 +126,8 @@ public class InOut extends SubsystemBase {
   
   public Command intoShooter() {
     return new InstantCommand(() -> m_intake.set(1))
-    .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
     .andThen(new InstantCommand(() -> m_intake.set(0)));
-  }
-
-  public Command loadaNote(BooleanSupplier notestate)
-  {
-    final double kspeed = .9;
-    return new ParallelDeadlineGroup(
-          new WaitUntilCommand(notestate), 
-          new RunCommand(() -> this.intakeNote(.9, notestate))
-          );
-  }
-
-public Command StartIntake(BooleanSupplier sup)
-{
-  mbeambreakintake = false;
-  return new RunCommand(() -> intakeNote(.9, sup), this);
-}
-
-public boolean mbeambreakintake = false;
-  //if manual Overide is True it will ignore The Beam Break
-public void intakeNote(double speed, BooleanSupplier maunalOveride){
-    if (isNoteInIntake() || maunalOveride.getAsBoolean()) {
-      mbeambreakintake = true;
-      setIntakeSpeed(0);
-    }
-    else {
-      setIntakeSpeed(speed);
-    }
-}
-
-  //Note detector
-  public Boolean isNoteInIntake() {
-    //when the BeamBreak is false there is a note in the Intake
-    return false;
-    //!bbInput.get();
   }
 
   public void setIntakeSpeed(double speed) {
@@ -184,8 +150,7 @@ public void intakeNote(double speed, BooleanSupplier maunalOveride){
     // if((d != kD)) { shooterPIDController.setD(d); kD = d; }
     // if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
     // if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
-
-    SmartDashboard.putBoolean("noteState", noteState);
+    
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
   }
   

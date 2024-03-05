@@ -105,11 +105,7 @@ public class RobotContainer {
       if (m_InOut != null && m_operatorGamepad != null) {
           m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
           () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
-          () -> 
-          // m_operatorGamepad.getRawButton(Button.kX) || 
-          // m_operatorGamepad.getRawButton(Button.kA) ||
-          // m_operatorGamepad.getRawButton(Button.kLT) 
-          // ||
+          () -> //pass a true when you want to use the intake in a command
           isAutonomous
           ));
         
@@ -120,21 +116,8 @@ public class RobotContainer {
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
     
-    //Intake Comand
-    Trigger MaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
-    
-    // BooleanSupplier IsInIntake = () -> m_InOut.mbeambreakintake;
-
-    //   new JoystickButton(m_operatorGamepad, Button.kA)
-    //   .onTrue(m_InOut.StartIntake(IsInIntake)
-    //   )
-    //   .onFalse(new InstantCommand(
-    //     () -> m_InOut.setIntakeSpeed(0), m_InOut
-    //   ));
-
-    new JoystickButton(m_operatorGamepad, Button.kLT)
+     new JoystickButton(m_operatorGamepad, Button.kLT)
     .onTrue(m_InOut.shootIntoSpeaker());
-    //.onFalse(new InstantCommand(() -> m_InOut.noteStateFalse()));
     
     new JoystickButton(m_operatorGamepad, Button.kX)
     .onTrue(m_InOut.intoShooter());
