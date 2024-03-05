@@ -123,14 +123,14 @@ public class RobotContainer {
     //Intake Comand
     Trigger MaunalOveride = new JoystickButton(m_operatorGamepad, Button.kY);
     
-    BooleanSupplier IsInIntake = () -> m_InOut.mbeambreakintake;
+    // BooleanSupplier IsInIntake = () -> m_InOut.mbeambreakintake;
 
-      new JoystickButton(m_operatorGamepad, Button.kA)
-      .onTrue(m_InOut.StartIntake(IsInIntake)
-      )
-      .onFalse(new InstantCommand(
-        () -> m_InOut.setIntakeSpeed(0), m_InOut
-      ));
+    //   new JoystickButton(m_operatorGamepad, Button.kA)
+    //   .onTrue(m_InOut.StartIntake(IsInIntake)
+    //   )
+    //   .onFalse(new InstantCommand(
+    //     () -> m_InOut.setIntakeSpeed(0), m_InOut
+    //   ));
 
     new JoystickButton(m_operatorGamepad, Button.kLT)
     .onTrue(m_InOut.shootIntoSpeaker());
