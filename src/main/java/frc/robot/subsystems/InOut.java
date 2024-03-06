@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
@@ -35,21 +36,23 @@ public class InOut extends SubsystemBase {
   //Output Top & Bottom 
   private final CANSparkMax m_FollowerShooter;
   private final CANSparkMax m_LeaderShooter;
-  private final CANSparkMax m_intake;
-  private SparkPIDController shooterPIDController;
   private static RelativeEncoder m_Encoder;
-  private static boolean noteState = false; //false is out //true is in
-
+  private SparkPIDController shooterPIDController;
   private static double kFF = 0.0002;
   private static double kP = 0.0001;
   private static double kI = 0;
   private static double kD = 0;
-  public static double kSetpoint = 2900;
+  public static final double kSetpoint = 2900;
   private static final double kMinOutput = -1;
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
-  //IR Beam Break
-  public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
+
+  //intake
+  private final CANSparkMax m_intake;
+  private SparkLimitSwitch m_bbLimitSwitch;
+  private static boolean noteState = false; //false is out //true is in
+  //IR Beam Break public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
+  
   //Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   /** Creates a new InOut. */
@@ -82,10 +85,13 @@ public class InOut extends SubsystemBase {
     // SmartDashboard.putNumber("Feed Forward", kFF);
     // SmartDashboard.putNumber("setpoint", kSetpoint);
    
-    //setting CAN ID's for Intake Motor Controler
+    //settings for Intake Motor
     m_intake = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
     m_intake.setIdleMode(InOutConstants.kIntakeIdleMode);
     m_intake.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
+
+    m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+    m_bbLimitSwitch.enableLimitSwitch(false);
   }
 
    /**
@@ -130,6 +136,16 @@ public class InOut extends SubsystemBase {
     .andThen(new InstantCommand(() -> m_intake.set(0)));
   }
 
+  public Command intakeCommand(double speed) {
+    m_bbLimitSwitch.enableLimitSwitch(true);
+    return this.startEnd(
+        () -> setIntakeSpeed(speed),
+        () -> setIntakeSpeed(0)
+      )
+      .until(()->m_bbLimitSwitch.isPressed())
+      .andThen(()-> m_bbLimitSwitch.enableLimitSwitch(false), this);
+  }
+
   public void setIntakeSpeed(double speed) {
     m_intake.set(speed);
   }
@@ -150,7 +166,7 @@ public class InOut extends SubsystemBase {
     // if((d != kD)) { shooterPIDController.setD(d); kD = d; }
     // if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
     // if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
-    
+    SmartDashboard.putBoolean("Intake Limit Enabled", m_bbLimitSwitch.isLimitSwitchEnabled());
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
   }
   
