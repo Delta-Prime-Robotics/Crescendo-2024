@@ -129,6 +129,11 @@ public class RobotContainer {
     new JoystickButton(m_operatorGamepad, Button.kRT)
       .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
       .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+
+      new JoystickButton(m_operatorGamepad, Button.kRB)
+      .onTrue(new RunCommand(() -> m_InOut.intakeCommand(.9), m_InOut))
+      .onFalse(new InstantCommand( () -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false), m_Arm));
+      
   }
 
   private void configureAutonomousChooser() {

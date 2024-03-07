@@ -49,7 +49,7 @@ public class InOut extends SubsystemBase {
 
   //intake
   private final CANSparkMax m_intake;
-  private SparkLimitSwitch m_bbLimitSwitch;
+  public SparkLimitSwitch m_bbLimitSwitch;
   private static boolean noteState = false; //false is out //true is in
   //IR Beam Break public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
   
@@ -90,7 +90,7 @@ public class InOut extends SubsystemBase {
     m_intake.setIdleMode(InOutConstants.kIntakeIdleMode);
     m_intake.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
 
-    m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+    m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
     m_bbLimitSwitch.enableLimitSwitch(false);
   }
 
@@ -142,7 +142,7 @@ public class InOut extends SubsystemBase {
         () -> setIntakeSpeed(speed),
         () -> setIntakeSpeed(0)
       )
-      .until(()->m_bbLimitSwitch.isPressed())
+      .until(() -> m_bbLimitSwitch.isPressed())
       .andThen(()-> m_bbLimitSwitch.enableLimitSwitch(false), this);
   }
 
