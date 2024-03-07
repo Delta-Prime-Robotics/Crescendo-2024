@@ -138,11 +138,13 @@ public class InOut extends SubsystemBase {
 
   public Command intakeCommand(double speed) {
     m_bbLimitSwitch.enableLimitSwitch(true);
+
     return this.startEnd(
         () -> setIntakeSpeed(speed),
         () -> setIntakeSpeed(0)
       )
       .until(() -> m_bbLimitSwitch.isPressed())
+      .handleInterrupt(()-> m_bbLimitSwitch.enableLimitSwitch(false))
       .andThen(()-> m_bbLimitSwitch.enableLimitSwitch(false), this);
   }
 
@@ -167,6 +169,7 @@ public class InOut extends SubsystemBase {
     // if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
     // if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
     SmartDashboard.putBoolean("Intake Limit Enabled", m_bbLimitSwitch.isLimitSwitchEnabled());
+    SmartDashboard.putBoolean("Intake 'beambreak'", m_bbLimitSwitch.isPressed());
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
   }
   
