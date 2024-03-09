@@ -42,6 +42,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Dashboard;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.HookSubsystem;
 import frc.robot.subsystems.InOut;
 
 /*
@@ -54,6 +55,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem(); 
   private final InOut m_InOut = new InOut();
+  private final HookSubsystem m_Hook = new HookSubsystem();
   private final ArmSubsystem m_Arm = new ArmSubsystem();
   private final Dashboard m_Dashboard = new Dashboard(m_robotDrive, m_InOut, m_Arm);
   private final Autos m_Autos = new Autos();
@@ -132,7 +134,16 @@ public class RobotContainer {
 
       new JoystickButton(m_operatorGamepad, Button.kRB)
       .onTrue(new RunCommand(() -> m_InOut.intakeCommand(.9), m_InOut))
-      .onFalse(new InstantCommand( () -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false), m_Arm));
+      .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+
+    new JoystickButton(m_driverGamepad, Button.kRT)
+      .onTrue(new RunCommand(() -> m_Hook.HookRun(.5), m_Hook))
+      .onFalse(new InstantCommand( () -> m_Hook.HookRun(0), m_Hook));
+
+    new JoystickButton(m_driverGamepad, Button.kLT)
+      .onTrue(new RunCommand(() -> m_Hook.HookRun(-0.5), m_Hook))
+      .onFalse(new InstantCommand( () -> m_Hook.HookRun(0), m_Hook));
+
       
   }
 

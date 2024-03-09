@@ -159,6 +159,13 @@ public final class Constants {
     public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;
   }
 
+  public final class HookConstants {
+    public static final int kHookLeftCanId = 18;
+    public static final int kHookRightCanId = 19;
+
+    public static final IdleMode kHookIdleMode = IdleMode.kBrake;
+  }
+
   public final class ArmConstants {
     //CanID
     public static final int kArmLeftCanId = 8;
