@@ -23,9 +23,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
@@ -133,8 +135,12 @@ public class RobotContainer {
       .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
 
       new JoystickButton(m_operatorGamepad, Button.kRB)
-      .onTrue(new RunCommand(() -> m_InOut.intakeCommand(.9), m_InOut))
-      .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+      .onTrue(new RunCommand(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(true), m_InOut)
+        .alongWith( new ParallelDeadlineGroup(
+                new WaitCommand(.5), 
+                new RunCommand(() -> m_InOut.setIntakeSpeed(.45))
+      )))
+      .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut).andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
 
     new JoystickButton(m_driverGamepad, Button.kRT)
       .onTrue(new RunCommand(() -> m_Hook.HookRun(.5), m_Hook))

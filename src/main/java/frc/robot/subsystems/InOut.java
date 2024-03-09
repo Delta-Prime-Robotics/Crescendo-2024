@@ -90,7 +90,7 @@ public class InOut extends SubsystemBase {
     m_intake.setIdleMode(InOutConstants.kIntakeIdleMode);
     m_intake.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
 
-    m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyClosed);
+    m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
     m_bbLimitSwitch.enableLimitSwitch(false);
   }
 
@@ -137,16 +137,9 @@ public class InOut extends SubsystemBase {
   }
 
   public Command intakeCommand(double speed) {
-    m_bbLimitSwitch.enableLimitSwitch(true);
 
-    return this.startEnd(
-        () -> setIntakeSpeed(speed),
-        () -> setIntakeSpeed(0)
-      )
-      .until(() -> m_bbLimitSwitch.isPressed())
-      .handleInterrupt(()-> m_bbLimitSwitch.enableLimitSwitch(false))
-      .andThen(()-> m_bbLimitSwitch.enableLimitSwitch(false), this);
-  }
+    return new RunCommand(()-> setIntakeSpeed(speed));
+     }
 
   public void setIntakeSpeed(double speed) {
     m_intake.set(speed);
