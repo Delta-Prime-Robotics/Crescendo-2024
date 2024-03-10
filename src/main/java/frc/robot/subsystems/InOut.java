@@ -104,19 +104,11 @@ public class InOut extends SubsystemBase {
   }
   
   private static double shooterVelocity() {
-    // double velocityInRPM = -m_Encoder.getVelocity();
-    // double wheelDiameter = 0.2; 
-    // // Convert RPM to Rotations per Second
-    // double rotationsPerSecond = velocityInRPM / 60.0;
-    // // Convert Rotations per Second to Meters per Second
-    // double velocityInMPS = rotationsPerSecond * (wheelDiameter * Math.PI);
-    // return (inMPS?velocityInMPS:velocityInRPM);
     return -m_Encoder.getVelocity(); 
     //NO TOUCHY
   }
 
-  //TO-DO
-  //GO THROUGH THIS one by one to test if it works
+  
   public Command shootIntoSpeaker(){
     final double kspeed = 2900; //Speed is in RPMs
     
@@ -137,9 +129,8 @@ public class InOut extends SubsystemBase {
   }
 
   public Command intakeCommand(double speed) {
-
     return new RunCommand(()-> setIntakeSpeed(speed));
-     }
+  }
 
   public void setIntakeSpeed(double speed) {
     m_intake.set(speed);

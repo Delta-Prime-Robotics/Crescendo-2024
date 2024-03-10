@@ -4,42 +4,23 @@
 
 package frc.robot;
 
-import java.util.List;
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.GamePad;
 import frc.robot.Constants.GamePad.Button;
 import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
 import frc.robot.commands.ArmManualMoveCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.IntakeJoystickCommand;
-import frc.robot.commands.ShooterAmpOrSpeakerCommand;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Dashboard;
@@ -140,16 +121,17 @@ public class RobotContainer {
                 new WaitCommand(.5), 
                 new RunCommand(() -> m_InOut.setIntakeSpeed(.45))
       )))
-      .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut).andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
+      .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
+      .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
+      
+    // new JoystickButton(m_driverGamepad, Button.kRT)
+    //   .onTrue(new RunCommand(() -> m_Hook.HookRun(.5), m_Hook))
+    //   .onFalse(new InstantCommand( () -> m_Hook.HookRun(0), m_Hook));
 
-    new JoystickButton(m_driverGamepad, Button.kRT)
-      .onTrue(new RunCommand(() -> m_Hook.HookRun(.5), m_Hook))
-      .onFalse(new InstantCommand( () -> m_Hook.HookRun(0), m_Hook));
-
-    new JoystickButton(m_driverGamepad, Button.kLT)
-      .onTrue(new RunCommand(() -> m_Hook.HookRun(-0.5), m_Hook))
-      .onFalse(new InstantCommand( () -> m_Hook.HookRun(0), m_Hook));
-
+    // new JoystickButton(m_driverGamepad, Button.kLT)
+    //   .onTrue(new RunCommand(() -> m_Hook.HookRun(-0.5), m_Hook))
+    //   .onFalse(new InstantCommand( () -> m_Hook.HookRun(0), m_Hook));
+    
       
   }
 
