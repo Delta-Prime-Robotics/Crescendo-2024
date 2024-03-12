@@ -209,8 +209,11 @@ public final class Constants {
         public static final int kRB = 6;
         public static final int kLT = 7;
         public static final int kRT = 8;
-        /* kBack = 9; kStart = 10 */
-        /* Joystick click: kLeftStick = 11, kRightStick = 12 */
+        public static final int kBack = 9; 
+        public static final int kStart = 10;
+        //Joystick click:
+        public static final int kLeftStickB = 11;
+        public static final int kRightStickB = 12;
     } 
   }
 }

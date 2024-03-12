@@ -4,17 +4,23 @@
 
 package frc.robot;
 
+import java.text.BreakIterator;
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GamePad.Button;
 import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
@@ -91,7 +97,7 @@ public class RobotContainer {
           m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
           () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
           () -> //pass a true when you want to use the intake in a command
-          isAutonomous
+          isAutonomous //RobotModeTriggers.autonomous().getAsBoolean();
           ));
         
       }
@@ -123,16 +129,34 @@ public class RobotContainer {
       )))
       .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
       .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
-      
+    
+    //hook bindings
+    JoystickButton hookButtonLT = new JoystickButton(m_driverGamepad, Button.kLT); 
+    JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kRT); 
+    JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kB);
+    
     // new JoystickButton(m_driverGamepad, Button.kRT)
-    //   .onTrue(new RunCommand(() -> m_Hook.HookRun(.5), m_Hook))
-    //   .onFalse(new InstantCommand( () -> m_Hook.HookRun(0), m_Hook));
+    //   .onTrue(new RunCommand(() -> m_Hook.voidHookRun(.5), m_Hook))
+    //   .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
 
     // new JoystickButton(m_driverGamepad, Button.kLT)
-    //   .onTrue(new RunCommand(() -> m_Hook.HookRun(-0.5), m_Hook))
-    //   .onFalse(new InstantCommand( () -> m_Hook.HookRun(0), m_Hook));
+    //   .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-0.5), m_Hook))
+    //   .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
     
-      
+    hookButtonLT.whileTrue(
+      new ConditionalCommand(
+        m_Hook.leftHookRunCommand(false),
+        m_Hook.leftHookRunCommand(true),
+        reverseTrigger
+    ));
+    
+    hookButtonRT.whileTrue(
+      new ConditionalCommand(
+        m_Hook.rightHookRunCommand(false),
+        m_Hook.rightHookRunCommand(true),
+        reverseTrigger
+    ));
+    
   }
 
   private void configureAutonomousChooser() {
