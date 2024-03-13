@@ -4,11 +4,15 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HookConstants;
@@ -41,8 +45,9 @@ public class HookSubsystem extends SubsystemBase {
   }
 
   private void rightRun(double speed) {
-    m_left.set(speed);
+    m_right.set(speed);
   }
+
   public void voidHookRun(double speed){
     m_left.set(speed);
     m_right.set(speed);
@@ -55,10 +60,13 @@ public class HookSubsystem extends SubsystemBase {
   public Command leftHookRunCommand(boolean direction) {
     double speed = 0.75;
     return this.startEnd(
-      direction 
-      ? ()-> System.out.println("left forwards") // ? () -> leftRun(speed) 
-      : ()-> System.out.println("left backwards"), // : () -> leftRun(-speed),
-      ()-> System.out.println("left stop")//()->m_left.stopMotor()
+      direction  
+      ? () -> leftRun(speed) 
+      : () -> leftRun(-speed),
+      ()-> m_left.stopMotor()
+      // ? ()-> System.out.println("left forwards")   
+      // : ()-> System.out.println("left backwards"), 
+      // ()-> System.out.println("left stop")        
     );
   }
   /**
@@ -69,9 +77,12 @@ public class HookSubsystem extends SubsystemBase {
     double speed = 0.75;
     return this.startEnd(
       direction
-      ? ()-> System.out.println("right forwards") // ? () -> rightRun(speed) 
-      : ()-> System.out.println("right backwards"), // : () -> rightRun(-speed),
-      ()-> System.out.println("right stop") //()->m_right.stopMotor()
+      ? () -> rightRun(speed) 
+      : () -> rightRun(-speed),
+      () -> m_right.stopMotor()
+      // ? ()-> System.out.println("right forwards")   
+      // : ()-> System.out.println("right backwards"), 
+      // ()-> System.out.println("right stop")        
     );
   }
 
@@ -82,6 +93,7 @@ public class HookSubsystem extends SubsystemBase {
     );
   }
   
+
   
   @Override
   public void periodic() {

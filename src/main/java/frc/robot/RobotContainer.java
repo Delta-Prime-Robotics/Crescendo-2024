@@ -135,13 +135,13 @@ public class RobotContainer {
     JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kRT); 
     JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kB);
     
-    // new JoystickButton(m_driverGamepad, Button.kRT)
-    //   .onTrue(new RunCommand(() -> m_Hook.voidHookRun(.5), m_Hook))
-    //   .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
+    new JoystickButton(m_driverGamepad, Button.kY)
+      .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
+      .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
 
-    // new JoystickButton(m_driverGamepad, Button.kLT)
-    //   .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-0.5), m_Hook))
-    //   .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
+    new JoystickButton(m_driverGamepad, Button.kA)
+      .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
+      .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
     
     hookButtonLT.whileTrue(
       new ConditionalCommand(
