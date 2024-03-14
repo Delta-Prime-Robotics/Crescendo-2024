@@ -42,7 +42,7 @@ public class InOut extends SubsystemBase {
   private static double kP = 0.0001;
   private static double kI = 0;
   private static double kD = 0;
-  public static final double kSetpoint = 2900;
+  public static final double kSetpoint = 3800;
   private static final double kMinOutput = -1;
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
@@ -110,7 +110,7 @@ public class InOut extends SubsystemBase {
 
   
   public Command shootIntoSpeaker(){
-    final double kspeed = 2900; //Speed is in RPMs
+    final double kspeed = kSetpoint; //Speed is in RPMs
     
     SequentialCommandGroup group = new SequentialCommandGroup(
       new ParallelDeadlineGroup(

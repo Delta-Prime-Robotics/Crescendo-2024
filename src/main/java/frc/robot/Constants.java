@@ -73,7 +73,7 @@ public final class Constants {
     // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
     // This changes the drive speed of the module (a pinion gear with more teeth will result in a
     // robot that drives faster).
-    public static final int kDrivingMotorPinionTeeth = 13;
+    public static final int kDrivingMotorPinionTeeth = 14;
 
     // Invert the turning encoder, since the output shaft rotates in the opposite direction of
     // the steering motor in the MAXSwerve Module.
