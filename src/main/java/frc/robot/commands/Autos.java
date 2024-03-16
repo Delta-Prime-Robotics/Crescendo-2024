@@ -33,17 +33,38 @@ public final class Autos {
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
         // Add kinematics to ensure max speed is actually obeyed
         .setKinematics(DriveConstants.kDriveKinematics);
+    public final Command reallyJustBackUpCommand(DriveSubsystem m_drive){
+        return new RunCommand(
+            ()-> m_drive.drive(
+                -0.5,
+                0,
+                0,
+                true,
+                true)
+        , m_drive)
+        .withTimeout(0.5);
+    }
     
     public final  Command justBackUpCommand(DriveSubsystem m_robotDrive) {
         // An example trajectory to follow. All units in meters.
+        // Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        //     // Start at the origin facing the +X direction
+        //     new Pose2d(0, 0, new Rotation2d(0)),
+        //     // Pass through these two interior waypoints, making an 's' curve path
+        //     List.of(new Translation2d(1, 0)), //, new Translation2d(1.5, 0)
+        //     // End 3 meters straight ahead of where we started, facing forward
+        //     new Pose2d(2, 0, new Rotation2d(0)),
+        //     config);
         Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            new Pose2d(0, 0, new Rotation2d(0)),
-            // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 0)), //, new Translation2d(1.5, 0)
-            // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(2, 0, new Rotation2d(0)),
-            config);
+        // Start at the origin facing the +X direction
+        new Pose2d(15.13, 5.00, new Rotation2d(0)),
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(new Translation2d(14.7, 5.25)), //, new Translation2d(1.5, 0)
+        // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(14.30, 5.50, new Rotation2d(0)),
+        config);        
+
+        m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
         var thetaController = new ProfiledPIDController(
             AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
@@ -76,35 +97,37 @@ public final class Autos {
     }
     
     public final Command shootAndMoveCommand(ArmSubsystem m_Arm, InOut m_InOut, DriveSubsystem m_robotDrive){
-        // An example trajectory to follow. All units in meters.
-        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            new Pose2d(0, 0, new Rotation2d(0)),
-            // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(-1, 0)), //, new Translation2d(1.5, 0)
-            // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(-2, 0, new Rotation2d(0)),
-            config);
+        // // An example trajectory to follow. All units in meters.
+        // Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        //     // Start at the origin facing the +X direction
+        //     new Pose2d(15.13, 5.00, new Rotation2d(0)),
+        //     // Pass through these two interior waypoints, making an 's' curve path
+        //     List.of(new Translation2d(1.0, 5.50)), //, new Translation2d(1.5, 0)
+        //     // End 3 meters straight ahead of where we started, facing forward
+        //     new Pose2d(14.30, 5.50, new Rotation2d(0)),
+        //     config);
 
-        var thetaController = new ProfiledPIDController(
-            AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        // var thetaController = new ProfiledPIDController(
+        //     AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+        // thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-            exampleTrajectory,
-            m_robotDrive::getPose, // Functional interface to feed supplier
-            DriveConstants.kDriveKinematics,
+        // SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+        //     exampleTrajectory,
+        //     m_robotDrive::getPose, // Functional interface to feed supplier
+        //     DriveConstants.kDriveKinematics,
 
-            // Position controllers
-            new PIDController(AutoConstants.kPXController, 0, 0),
-            new PIDController(AutoConstants.kPYController, 0, 0),
-            thetaController,
-            m_robotDrive::setModuleStates,
-            m_robotDrive);
+        //     // Position controllers
+        //     new PIDController(AutoConstants.kPXController, 0, 0),
+        //     new PIDController(AutoConstants.kPYController, 0, 0),
+        //     thetaController,
+        //     m_robotDrive::setModuleStates,
+        //     m_robotDrive);
 
-        return justShootCommand(m_Arm,m_InOut).andThen(swerveControllerCommand)
-        .andThen(() -> m_robotDrive.drive(0, 0, 0, false, false))
-        .andThen(justBackUpCommand(m_robotDrive));
+        return justShootCommand(m_Arm,m_InOut)
+        .andThen(reallyJustBackUpCommand(m_robotDrive))
+        // .andThen(swerveControllerCommand)
+        .andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
+        // .andThen(justBackUpCommand(m_robotDrive));
     }
 
     public final Command doNothing() {
