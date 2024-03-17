@@ -102,7 +102,7 @@ public class RobotContainer {
         
       }
 
-     new JoystickButton(m_driverGamepad, Button.kLB)
+     new JoystickButton(m_driverGamepad, Button.kBack)
          .onTrue(new InstantCommand(
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
@@ -131,15 +131,15 @@ public class RobotContainer {
       // .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
     
     //hook bindings
-    JoystickButton hookButtonLT = new JoystickButton(m_driverGamepad, Button.kLT); 
-    JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kRT); 
-    JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kB);
+    JoystickButton hookButtonLT = new JoystickButton(m_driverGamepad, Button.kX); 
+    JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kB); 
+    JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kRB);
     
-    new JoystickButton(m_driverGamepad, Button.kY)
+    new JoystickButton(m_driverGamepad, Button.kLT)
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
       .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
 
-    new JoystickButton(m_driverGamepad, Button.kA)
+    new JoystickButton(m_driverGamepad, Button.kRT)
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
       .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
     
