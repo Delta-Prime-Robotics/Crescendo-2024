@@ -17,6 +17,7 @@ import edu.wpi.first.math.MathUtil;
 
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.NeoMotorConstants;
@@ -129,13 +130,26 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  public Command getArmInGroundPostion() {
+    return runOnce(()-> armRun(0.3))
+    .until(()->armAngleInGroundRange())
+    .finallyDo(()-> armRun(0));
+  }
+
   public boolean armAngleInSpeakerRange()
   {
     // These need to be constant values that we can update
     return ((this.armRotation() > kMinSpeakerAngle) &&
             (this.armRotation() < kMaxSpeakerAngle));
-
   }
+
+  public boolean armAngleInGroundRange()
+  {
+    // These need to be constant values that we can update
+    return MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(), 0.05, 0, 1);
+  }
+
+  
   
 //  public Command goToAmp() {
 //  return this.run(()-> setRef(ArmConstants.kAmpPosition));
