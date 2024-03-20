@@ -22,7 +22,6 @@ import frc.robot.subsystems.DriveSubsystem;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  public static boolean isInAuto;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -30,7 +29,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     DriverStation.silenceJoystickConnectionWarning(true);
-    DataLogManager.start();
+    //DataLogManager.start();
     //URCL.start();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.

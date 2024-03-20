@@ -73,7 +73,7 @@ public final class Constants {
     // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
     // This changes the drive speed of the module (a pinion gear with more teeth will result in a
     // robot that drives faster).
-    public static final int kDrivingMotorPinionTeeth = 13;
+    public static final int kDrivingMotorPinionTeeth = 14;
 
     // Invert the turning encoder, since the output shaft rotates in the opposite direction of
     // the steering motor in the MAXSwerve Module.
@@ -159,6 +159,13 @@ public final class Constants {
     public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;
   }
 
+  public final class HookConstants {
+    public static final int kHookLeftCanId = 18;
+    public static final int kHookRightCanId = 19;
+
+    public static final IdleMode kHookIdleMode = IdleMode.kBrake;
+  }
+
   public final class ArmConstants {
     //CanID
     public static final int kArmLeftCanId = 8;
@@ -202,8 +209,11 @@ public final class Constants {
         public static final int kRB = 6;
         public static final int kLT = 7;
         public static final int kRT = 8;
-        /* kBack = 9; kStart = 10 */
-        /* Joystick click: kLeftStick = 11, kRightStick = 12 */
+        public static final int kBack = 9; 
+        public static final int kStart = 10;
+        //Joystick click:
+        public static final int kLeftStickB = 11;
+        public static final int kRightStickB = 12;
     } 
   }
 }

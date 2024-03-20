@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
@@ -35,21 +36,23 @@ public class InOut extends SubsystemBase {
   //Output Top & Bottom 
   private final CANSparkMax m_FollowerShooter;
   private final CANSparkMax m_LeaderShooter;
-  private final CANSparkMax m_intake;
-  private SparkPIDController shooterPIDController;
   private static RelativeEncoder m_Encoder;
-  private static boolean noteState = false; //false is out //true is in
-
+  private SparkPIDController shooterPIDController;
   private static double kFF = 0.0002;
   private static double kP = 0.0001;
   private static double kI = 0;
   private static double kD = 0;
-  public static double kSetpoint = 2900;
+  public static final double kSetpoint = 3800;
   private static final double kMinOutput = -1;
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
-  //IR Beam Break
-  public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
+
+  //intake
+  private final CANSparkMax m_intake;
+  public SparkLimitSwitch m_bbLimitSwitch;
+  private static boolean noteState = false; //false is out //true is in
+  //IR Beam Break public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
+  
   //Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   /** Creates a new InOut. */
@@ -82,10 +85,13 @@ public class InOut extends SubsystemBase {
     // SmartDashboard.putNumber("Feed Forward", kFF);
     // SmartDashboard.putNumber("setpoint", kSetpoint);
    
-    //setting CAN ID's for Intake Motor Controler
+    //settings for Intake Motor
     m_intake = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
     m_intake.setIdleMode(InOutConstants.kIntakeIdleMode);
     m_intake.setSmartCurrentLimit(NeoMotorConstants.kNeo550SetCurrent);
+
+    m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
+    m_bbLimitSwitch.enableLimitSwitch(false);
   }
 
    /**
@@ -98,21 +104,13 @@ public class InOut extends SubsystemBase {
   }
   
   private static double shooterVelocity() {
-    // double velocityInRPM = -m_Encoder.getVelocity();
-    // double wheelDiameter = 0.2; 
-    // // Convert RPM to Rotations per Second
-    // double rotationsPerSecond = velocityInRPM / 60.0;
-    // // Convert Rotations per Second to Meters per Second
-    // double velocityInMPS = rotationsPerSecond * (wheelDiameter * Math.PI);
-    // return (inMPS?velocityInMPS:velocityInRPM);
     return -m_Encoder.getVelocity(); 
     //NO TOUCHY
   }
 
-  //TO-DO
-  //GO THROUGH THIS one by one to test if it works
+  
   public Command shootIntoSpeaker(){
-    final double kspeed = 2900; //Speed is in RPMs
+    final double kspeed = kSetpoint; //Speed is in RPMs
     
     SequentialCommandGroup group = new SequentialCommandGroup(
       new ParallelDeadlineGroup(
@@ -126,42 +124,12 @@ public class InOut extends SubsystemBase {
   
   public Command intoShooter() {
     return new InstantCommand(() -> m_intake.set(1))
-    .andThen(new WaitCommand(1.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
+    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
     .andThen(new InstantCommand(() -> m_intake.set(0)));
   }
 
-  public Command loadaNote(BooleanSupplier notestate)
-  {
-    final double kspeed = .9;
-    return new ParallelDeadlineGroup(
-          new WaitUntilCommand(notestate), 
-          new RunCommand(() -> this.intakeNote(.9, notestate))
-          );
-  }
-
-public Command StartIntake(BooleanSupplier sup)
-{
-  mbeambreakintake = false;
-  return new RunCommand(() -> intakeNote(.9, sup), this);
-}
-
-public boolean mbeambreakintake = false;
-  //if manual Overide is True it will ignore The Beam Break
-public void intakeNote(double speed, BooleanSupplier maunalOveride){
-    if (isNoteInIntake() || maunalOveride.getAsBoolean()) {
-      mbeambreakintake = true;
-      setIntakeSpeed(0);
-    }
-    else {
-      setIntakeSpeed(speed);
-    }
-}
-
-  //Note detector
-  public Boolean isNoteInIntake() {
-    //when the BeamBreak is false there is a note in the Intake
-    return false;
-    //!bbInput.get();
+  public Command intakeCommand(double speed) {
+    return new RunCommand(()-> setIntakeSpeed(speed));
   }
 
   public void setIntakeSpeed(double speed) {
@@ -184,8 +152,8 @@ public void intakeNote(double speed, BooleanSupplier maunalOveride){
     // if((d != kD)) { shooterPIDController.setD(d); kD = d; }
     // if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
     // if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
-
-    SmartDashboard.putBoolean("noteState", noteState);
+    SmartDashboard.putBoolean("Intake Limit Enabled", m_bbLimitSwitch.isLimitSwitchEnabled());
+    SmartDashboard.putBoolean("Intake 'beambreak'", m_bbLimitSwitch.isPressed());
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
   }
   
