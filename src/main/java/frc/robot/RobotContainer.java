@@ -79,35 +79,35 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
       // The left stick controls translation of the robot.
       // Turning is controlled by the X axis of the right stick.
-     new RunCommand(
-          () -> m_robotDrive.drive(
-              -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kUpDown), OIConstants.kDriveDeadband),
-              -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kLeftRight), OIConstants.kDriveDeadband),
-              -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(RightStick.kLeftRight), OIConstants.kDriveDeadband),
-              true, true),
-          m_robotDrive));
+    new RunCommand(
+        () -> m_robotDrive.drive(
+            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kUpDown), OIConstants.kDriveDeadband),
+            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(LeftStick.kLeftRight), OIConstants.kDriveDeadband),
+            -MathUtil.applyDeadband(m_driverGamepad.getRawAxis(RightStick.kLeftRight), OIConstants.kDriveDeadband),
+            true, true),
+        m_robotDrive));
       
-      if (m_Arm != null && m_operatorGamepad != null) {
-          m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
-          () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
+    if (m_Arm != null && m_operatorGamepad != null) {
+        m_Arm.setDefaultCommand(new ArmManualMoveCommand(m_Arm, 
+        () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(LeftStick.kUpDown), 0.05)
+      ));
+    }
+    
+    if (m_InOut != null && m_operatorGamepad != null) {
+        m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
+        () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
+        () -> //pass a true when you want to use the intake in a command
+        isAutonomous //RobotModeTriggers.autonomous().getAsBoolean();
         ));
-      }
-    
-      if (m_InOut != null && m_operatorGamepad != null) {
-          m_InOut.setDefaultCommand(new IntakeJoystickCommand (m_InOut, 
-          () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
-          () -> //pass a true when you want to use the intake in a command
-          isAutonomous //RobotModeTriggers.autonomous().getAsBoolean();
-          ));
-        
-      }
+      
+    }
 
-     new JoystickButton(m_driverGamepad, Button.kBack)
-         .onTrue(new InstantCommand(
-            () -> m_robotDrive.zeroHeading(),
-            m_robotDrive));
+    new JoystickButton(m_driverGamepad, Button.kBack)
+      .onTrue(new InstantCommand(
+        () -> m_robotDrive.zeroHeading(),
+        m_robotDrive));
     
-     new JoystickButton(m_operatorGamepad, Button.kLT)
+    new JoystickButton(m_operatorGamepad, Button.kLT)
     .onTrue(m_InOut.shootIntoSpeaker());
     
     new JoystickButton(m_operatorGamepad, Button.kX)
@@ -156,7 +156,6 @@ public class RobotContainer {
         m_Hook.rightHookRunCommand(true),
         reverseTrigger
     ));
-    
   }
 
   private void configureAutonomousChooser() {
