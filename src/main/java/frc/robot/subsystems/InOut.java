@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,6 +22,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
@@ -46,18 +48,19 @@ public class InOut extends SubsystemBase {
   private static final double kMinOutput = -1;
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
+  public static boolean IsNoteInIntake = false;
+
 
   //intake
   private final CANSparkMax m_intake;
   public SparkLimitSwitch m_bbLimitSwitch;
-  private static boolean noteState = false; //false is out //true is in
+
   //IR Beam Break public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
   
   //Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
 
   /** Creates a new InOut. */
   public InOut() {
-
     //setting CAN ID's for Shooter Motor Controlers
     m_LeaderShooter = new CANSparkMax(InOutConstants.kTopOutputCanId, MotorType.kBrushless);//Top
     m_FollowerShooter = new CANSparkMax(InOutConstants.kBottomOutputCanId, MotorType.kBrushless);//Bottom
@@ -84,7 +87,7 @@ public class InOut extends SubsystemBase {
     // SmartDashboard.putNumber("D Gain", kD);
     // SmartDashboard.putNumber("Feed Forward", kFF);
     // SmartDashboard.putNumber("setpoint", kSetpoint);
-   
+    
     //settings for Intake Motor
     m_intake = new CANSparkMax(InOutConstants.kIntakeCanId, MotorType.kBrushless);
     m_intake.setIdleMode(InOutConstants.kIntakeIdleMode);
@@ -92,6 +95,7 @@ public class InOut extends SubsystemBase {
 
     m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
     m_bbLimitSwitch.enableLimitSwitch(false);
+    SmartDashboard.putBoolean("IsNoteInIntake", IsNoteInIntake);
   }
 
    /**
@@ -129,7 +133,15 @@ public class InOut extends SubsystemBase {
   }
 
   public Command intakeCommand(double speed) {
-    return new RunCommand(()-> setIntakeSpeed(speed));
+    return new RunCommand(()-> setIntakeSpeed(speed), this)
+     //Sets Motor speed
+    .unless(()-> IsNoteInIntake) 
+    //This will only run the command
+    // if the note is not in the intake 
+    .until(()->IsNoteInIntake)
+    //This will stop the command when the note is in the Intake
+    .finallyDo(()-> m_intake.stopMotor());
+    //This stops the motor at end of command or during a interupt
   }
 
   public void setIntakeSpeed(double speed) {
@@ -152,8 +164,12 @@ public class InOut extends SubsystemBase {
     // if((d != kD)) { shooterPIDController.setD(d); kD = d; }
     // if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
     // if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
-    SmartDashboard.putBoolean("Intake Limit Enabled", m_bbLimitSwitch.isLimitSwitchEnabled());
-    SmartDashboard.putBoolean("Intake 'beambreak'", m_bbLimitSwitch.isPressed());
+    
+    boolean noteState = SmartDashboard.getBoolean("IsNoteInIntake", false);
+    if((noteState != IsNoteInIntake)) { noteState = IsNoteInIntake;}
+
+    // SmartDashboard.putBoolean("Intake Limit Enabled", m_bbLimitSwitch.isLimitSwitchEnabled());
+    // SmartDashboard.putBoolean("Intake 'beambreak'", m_bbLimitSwitch.isPressed());
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
   }
   
