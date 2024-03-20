@@ -8,6 +8,7 @@ import java.text.BreakIterator;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -29,7 +30,6 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.IntakeJoystickCommand;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.Dashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HookSubsystem;
 import frc.robot.subsystems.InOut;
@@ -46,7 +46,6 @@ public class RobotContainer {
   private final InOut m_InOut = new InOut();
   private final HookSubsystem m_Hook = new HookSubsystem();
   private final ArmSubsystem m_Arm = new ArmSubsystem();
-  private final Dashboard m_Dashboard = new Dashboard(m_robotDrive, m_InOut, m_Arm);
   private final Autos m_Autos = new Autos();
   public boolean isAutonomous = true;
   
@@ -54,6 +53,8 @@ public class RobotContainer {
   private final Joystick m_driverGamepad = new Joystick(Constants.UsbPort.kGamePadDr);
   //The Operator's controller
   private final Joystick m_operatorGamepad = new Joystick(Constants.UsbPort.kGamePadO);
+  //The Programer's controller
+  private final GenericHID m_testingGampad = new GenericHID(1);
   
   SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
   /**
@@ -159,11 +160,11 @@ public class RobotContainer {
   }
 
   private void configureAutonomousChooser() {
-    m_AutoChooser.setDefaultOption("Do Nothing", m_Autos.doNothing());
-    m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
     m_AutoChooser.addOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
     m_AutoChooser.addOption("shoot and back", m_Autos.shootAndMoveCommand(m_Arm, m_InOut, m_robotDrive));
-    m_AutoChooser.addOption("really Just Back Up", m_Autos.reallyJustBackUpCommand(m_robotDrive));
+    m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
+    m_AutoChooser.addOption("Shoot Then Backup While Intaking", getAutonomousCommand());
+    m_AutoChooser.setDefaultOption("Do Nothing", m_Autos.doNothing());
     SmartDashboard.putData(m_AutoChooser);
   }
   /**
