@@ -54,7 +54,7 @@ public class RobotContainer {
   //The Operator's controller
   private final Joystick m_operatorGamepad = new Joystick(Constants.UsbPort.kGamePadO);
   //The Programer's controller
-  private final GenericHID m_testingGampad = new GenericHID(1);
+  private final Joystick m_testingGampad = new Joystick(Constants.UsbPort.kTestingControler);
   
   SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
   /**
@@ -99,8 +99,7 @@ public class RobotContainer {
         () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
         () -> //pass a true when you want to use the intake in a command
         isAutonomous //RobotModeTriggers.autonomous().getAsBoolean();
-        ));
-      
+        )); 
     }
 
     new JoystickButton(m_driverGamepad, Button.kBack)
@@ -122,14 +121,14 @@ public class RobotContainer {
       .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
       .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
 
-      // new JoystickButton(m_operatorGamepad, Button.kRB)
-      // .onTrue(new RunCommand(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(true), m_InOut)
-      //   .alongWith( new ParallelDeadlineGroup(
-      //           new WaitCommand(.5), 
-      //           new RunCommand(() -> m_InOut.setIntakeSpeed(.45))
-      // )))
-      // .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
-      // .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
+    new JoystickButton(m_operatorGamepad, Button.kRB)
+    .onTrue(new RunCommand(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(true), m_InOut)
+      .alongWith( new ParallelDeadlineGroup(
+              new WaitCommand(.5), 
+              new RunCommand(() -> m_InOut.setIntakeSpeed(.45))
+    )))
+    .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
+    .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
     
     //hook bindings
     JoystickButton hookButtonLT = new JoystickButton(m_driverGamepad, Button.kX); 
@@ -157,6 +156,17 @@ public class RobotContainer {
         m_Hook.rightHookRunCommand(true),
         reverseTrigger
     ));
+    
+    new JoystickButton(m_testingGampad, Button.kA)
+    .onTrue(m_InOut.intakeCommand(0.4))
+    .onFalse(m_InOut.stopIntake());
+    
+    // new JoystickButton(m_testingGampad, Button.kR)
+    // .onTrue(m_InOut.intakeCommand(1))
+    // .onFalse(m_InOut.stopIntake());
+
+    // .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
+    // .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
   }
 
   private void configureAutonomousChooser() {

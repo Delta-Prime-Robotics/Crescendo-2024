@@ -48,8 +48,8 @@ public class InOut extends SubsystemBase {
   private static final double kMinOutput = -1;
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
-  public static boolean IsNoteInIntake = false;
-
+  public static DigitalInput m_LimitSwitch = new DigitalInput(0);
+  public static boolean IsNoteInIntake = m_LimitSwitch.get();
 
   //intake
   private final CANSparkMax m_intake;
@@ -95,7 +95,7 @@ public class InOut extends SubsystemBase {
 
     m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
     m_bbLimitSwitch.enableLimitSwitch(false);
-    SmartDashboard.putBoolean("IsNoteInIntake", IsNoteInIntake);
+   
   }
 
    /**
@@ -133,15 +133,23 @@ public class InOut extends SubsystemBase {
   }
 
   public Command intakeCommand(double speed) {
-    return new RunCommand(()-> setIntakeSpeed(speed), this)
+    return new InstantCommand(()-> setIntakeSpeed(speed), this)
      //Sets Motor speed
-    .unless(()-> IsNoteInIntake) 
+    //.unless(()-> IsNoteInIntake) 
     //This will only run the command
     // if the note is not in the intake 
-    .until(()->IsNoteInIntake)
+    .andThen(
+      new WaitUntilCommand(
+        ()-> m_LimitSwitch.get()
+      )
+    )
     //This will stop the command when the note is in the Intake
     .finallyDo(()-> m_intake.stopMotor());
     //This stops the motor at end of command or during a interupt
+  }
+
+  public Command stopIntake() {
+    return this.runOnce(()-> m_intake.stopMotor());
   }
 
   public void setIntakeSpeed(double speed) {
@@ -165,11 +173,11 @@ public class InOut extends SubsystemBase {
     // if((ff != kFF)) { shooterPIDController.setFF(ff); kFF = ff; }
     // if((setpoint != kSetpoint)) { kSetpoint = setpoint;}
     
-    boolean noteState = SmartDashboard.getBoolean("IsNoteInIntake", false);
-    if((noteState != IsNoteInIntake)) { noteState = IsNoteInIntake;}
-
-    // SmartDashboard.putBoolean("Intake Limit Enabled", m_bbLimitSwitch.isLimitSwitchEnabled());
-    // SmartDashboard.putBoolean("Intake 'beambreak'", m_bbLimitSwitch.isPressed());
+    // boolean noteState = SmartDashboard.getBoolean("IsNoteInIntake", false);
+    // if((noteState != IsNoteInIntake)) { noteState = IsNoteInIntake;}
+    SmartDashboard.putBoolean("IsNoteInIntake", m_LimitSwitch.get());
+    SmartDashboard.putBoolean("Intake Limit Enabled", m_bbLimitSwitch.isLimitSwitchEnabled());
+    SmartDashboard.putBoolean("Intake 'beambreak'", m_bbLimitSwitch.isPressed());
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
   }
   
