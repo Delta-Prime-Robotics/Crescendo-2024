@@ -160,6 +160,10 @@ public class RobotContainer {
     new JoystickButton(m_testingGampad, Button.kA)
     .onTrue(m_InOut.intakeCommand(0.4))
     .onFalse(m_InOut.stopIntake());
+
+    new JoystickButton(m_testingGampad, Button.kRT)
+    .onTrue(m_Arm.getArmInGroundPostion())
+    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
     
     // new JoystickButton(m_testingGampad, Button.kR)
     // .onTrue(m_InOut.intakeCommand(1))

@@ -131,7 +131,19 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public Command getArmInGroundPostion() {
-    return runOnce(()-> armRun(0.3))
+    // if (armAngleInGroundRange())
+    // {
+    //     m_leader.set(0);
+    // }
+    // else
+    // {
+    //   double speed = -0.3;
+    //   // if ( this.armRotation() > kMaxSpeakerAngle)
+    //   //   speed *= -1.0;
+
+    //   m_leader.set(speed);
+    // }
+    return this.run(()-> armRun(-0.3))
     .until(()->armAngleInGroundRange())
     .finallyDo(()-> armRun(0));
   }
@@ -146,7 +158,7 @@ public class ArmSubsystem extends SubsystemBase {
   public boolean armAngleInGroundRange()
   {
     // These need to be constant values that we can update
-    return MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(), 0.05, 0, 1);
+    return MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(), 0.0005, 0, 1);
   }
 
   
@@ -163,6 +175,7 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("AbsoluteEncoder",  armRotation());
     SmartDashboard.putString("armState", armStateLogic.get().toString());
+    SmartDashboard.putBoolean("InGround Postion", armAngleInGroundRange());
     // This method will be called once per scheduler run
   }
 }
