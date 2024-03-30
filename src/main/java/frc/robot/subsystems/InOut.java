@@ -49,7 +49,6 @@ public class InOut extends SubsystemBase {
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
   public static DigitalInput m_LimitSwitch = new DigitalInput(0);
-  public static boolean IsNoteInIntake = m_LimitSwitch.get();
 
   //intake
   private final CANSparkMax m_intake;
@@ -98,6 +97,10 @@ public class InOut extends SubsystemBase {
    
   }
 
+  public boolean IsNoteInIntake() {
+    return !m_LimitSwitch.get();
+  }
+
    /**
    * sets the Velocity setpoint of the PIDControler to inputed speed
    * @param speed in rpm
@@ -140,7 +143,7 @@ public class InOut extends SubsystemBase {
     // if the note is not in the intake 
     .andThen(
       new WaitUntilCommand(
-        ()-> m_LimitSwitch.get()
+        ()-> IsNoteInIntake()
       )
     )
     //This will stop the command when the note is in the Intake
@@ -175,7 +178,7 @@ public class InOut extends SubsystemBase {
     
     // boolean noteState = SmartDashboard.getBoolean("IsNoteInIntake", false);
     // if((noteState != IsNoteInIntake)) { noteState = IsNoteInIntake;}
-    SmartDashboard.putBoolean("IsNoteInIntake", m_LimitSwitch.get());
+    SmartDashboard.putBoolean("IsNoteInIntake", IsNoteInIntake());
     SmartDashboard.putBoolean("Intake Limit Enabled", m_bbLimitSwitch.isLimitSwitchEnabled());
     SmartDashboard.putBoolean("Intake 'beambreak'", m_bbLimitSwitch.isPressed());
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());

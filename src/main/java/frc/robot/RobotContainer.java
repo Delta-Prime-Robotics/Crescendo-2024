@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import frc.robot.Constants.GamePad.Button;
 import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
@@ -57,14 +59,22 @@ public class RobotContainer {
   private final Joystick m_testingGampad = new Joystick(Constants.UsbPort.kTestingControler);
   
   SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  private final SendableChooser<Command> m_pathChooser;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    
+    configurePathPlanerChooser();
+
+    m_pathChooser = AutoBuilder.buildAutoChooser();
+
     // Configure the button bindings
-    configureBindings();
     configureAutonomousChooser();
+    configureBindings();
+   
+
+    SmartDashboard.putData("Auto Chooser", m_pathChooser);
   }
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -181,12 +191,18 @@ public class RobotContainer {
     m_AutoChooser.setDefaultOption("Do Nothing", m_Autos.doNothing());
     SmartDashboard.putData(m_AutoChooser);
   }
+
+  private void configurePathPlanerChooser(){
+    NamedCommands.registerCommand("Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
+    NamedCommands.registerCommand("SquatAndNomNom", m_Autos.toGroundAndGrabCommand(m_Arm, m_InOut));
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_AutoChooser.getSelected();
+    return m_pathChooser.getSelected();
+    //return m_AutoChooser.getSelected();
   }
 }

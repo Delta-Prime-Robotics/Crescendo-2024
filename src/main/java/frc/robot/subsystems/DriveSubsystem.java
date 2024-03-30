@@ -4,12 +4,15 @@
 
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,6 +25,7 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,16 +71,21 @@ public class DriveSubsystem extends SubsystemBase {
   private final Field2d m_Field = new Field2d();
 
   // Odometry class for tracking robot pose
-  SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(m_navx.getAngle()),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      });
-
+  // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
+  //     DriveConstants.kDriveKinematics,
+  //     m_navx.getRotation2d(),//Rotation2d.fromDegrees(m_navx.getAngle()),
+  //     new SwerveModulePosition[] {
+  //         m_frontLeft.getPosition(),
+  //         m_frontRight.getPosition(),
+  //         m_rearLeft.getPosition(),
+  //         m_rearRight.getPosition()
+  //     });
+  SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
+    DriveConstants.kDriveKinematics,
+    getHeading(),
+    getModulePositions(),
+    new Pose2d());
+    
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     try {
@@ -93,8 +102,8 @@ public class DriveSubsystem extends SubsystemBase {
                 this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your
                                                  // Constants class
-                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                        new PIDConstants(1, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(1, 0.0, 0.0), // Rotation PID constants
                         Constants.DriveConstants.kMaxSpeedMetersPerSecond, // Max module speed, in m/s
                         0.4, // Drive base radius in meters. Distance from robot center to furthest module.
                         new ReplanningConfig() // Default path replanning config. See the API for the options here
@@ -121,14 +130,18 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(
-        Rotation2d.fromDegrees(m_navx.getAngle()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
+    // m_odometry.update(
+    //     Rotation2d.fromDegrees(m_navx.getAngle()),
+    //     new SwerveModulePosition[] {
+    //         m_frontLeft.getPosition(),
+    //         m_frontRight.getPosition(),
+    //         m_rearLeft.getPosition(),
+    //         m_rearRight.getPosition()
+    //     });
+    m_poseEstimator.update(
+      getHeading(),
+      getModulePositions()
+      );
     
     //robot postion on field
     m_Field.setRobotPose(getPose());
@@ -142,7 +155,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    // return m_odometry.getPoseMeters();
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -151,16 +165,21 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
-        //Rotation2d.fromDegrees(m_navx.getAngle())// 
-        m_navx.getRotation2d(),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        },
-        pose);
+    // m_odometry.resetPosition(
+    //     //Rotation2d.fromDegrees(m_navx.getAngle())// 
+    //     m_navx.getRotation2d(),
+    //     new SwerveModulePosition[] {
+    //         m_frontLeft.getPosition(),
+    //         m_frontRight.getPosition(),
+    //         m_rearLeft.getPosition(),
+    //         m_rearRight.getPosition()
+    //     },
+    //     pose);
+
+    m_poseEstimator.resetPosition(
+      getHeading(),
+      getModulePositions(),    
+      pose);
   }
 
   /**
@@ -230,7 +249,14 @@ public class DriveSubsystem extends SubsystemBase {
     double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
-
+    
+    Optional<Alliance> ally = DriverStation.getAlliance();
+      if (ally.isPresent() && ally.get() == Alliance.Red) {
+          xSpeedDelivered *= -1;
+          ySpeedDelivered *= -1;
+    }
+    
+    drive(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered), fieldRelative);
     //as a option use these instead
     // ChassisSpeeds m_fieldRevChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, m_navx.getRotation2d());
     // SmartDashboard.putData("field relitive chassis speeds", (Sendable) m_fieldRevChassisSpeeds); // this definitly does not work.
@@ -246,8 +272,6 @@ public class DriveSubsystem extends SubsystemBase {
     // m_frontRight.setDesiredState(swerveModuleStates[1]);
     // m_rearLeft.setDesiredState(swerveModuleStates[2]);
     // m_rearRight.setDesiredState(swerveModuleStates[3]);
-
-    drive(new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered), fieldRelative);
   }
 
   private void driveRobotRelative(ChassisSpeeds speeds) {
@@ -256,7 +280,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private void drive(ChassisSpeeds speeds, boolean fieldRelative) {
     if (fieldRelative)
-        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation());
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation()); //m_navx.getRotation2d()
     //speeds = ChassisSpeeds.discretize(speeds, LoggedRobot.defaultPeriodSecs);
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -301,6 +325,15 @@ public class DriveSubsystem extends SubsystemBase {
       };
   }
 
+  private SwerveModulePosition[] getModulePositions(){
+    return new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+    };
+  }
+
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetEncoders() {
     m_frontLeft.resetEncoders();
@@ -326,8 +359,6 @@ public class DriveSubsystem extends SubsystemBase {
   private Rotation2d getHeading() {
     return Rotation2d.fromDegrees(m_navx.getAngle() * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
   }
-
-  
 
   /**
    * Returns the turn rate of the robot.
