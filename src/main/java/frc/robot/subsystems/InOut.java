@@ -136,19 +136,25 @@ public class InOut extends SubsystemBase {
   }
 
   public Command intakeCommand(double speed) {
-    return new InstantCommand(()-> setIntakeSpeed(speed), this)
+    //return new InstantCommand(()-> setIntakeSpeed(speed), this)
      //Sets Motor speed
     //.unless(()-> IsNoteInIntake) 
     //This will only run the command
     // if the note is not in the intake 
-    .andThen(
-      new WaitUntilCommand(
-        ()-> IsNoteInIntake()
-      )
-    )
+    // .andThen(
+    //   new WaitUntilCommand(
+    //     ()-> IsNoteInIntake()
+    //   )
+    // )
     //This will stop the command when the note is in the Intake
+    return new RunCommand(()-> setIntakeSpeed(speed), this)
     .finallyDo(()-> m_intake.stopMotor());
     //This stops the motor at end of command or during a interupt
+  }
+
+  public Command reverseCommand() {
+    return this.runEnd(()->setIntakeSpeed(-0.25), () -> m_intake.stopMotor())
+    .withTimeout(0.5);
   }
 
   public Command stopIntake() {

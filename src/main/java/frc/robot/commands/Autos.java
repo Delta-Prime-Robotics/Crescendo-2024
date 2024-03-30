@@ -63,10 +63,9 @@ public final class Autos {
    
     public final Command toGroundAndGrabCommand(ArmSubsystem m_Arm, InOut m_InOut){
         return m_Arm.getArmInGroundPostion()
-        .alongWith(
-            m_InOut.intakeCommand(1)
-            .withTimeout(3)
-        );
+        .alongWith(m_InOut.intakeCommand(1))
+        .withTimeout(2)
+        .andThen(m_InOut.reverseCommand());
     }
     
     public final Command justShootCommand(ArmSubsystem m_Arm, InOut m_InOut) {

@@ -18,9 +18,34 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "top 1.0"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SquatAndNomNom"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "top start - blue"
+            "pathName": "top 1.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]

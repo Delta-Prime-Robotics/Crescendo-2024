@@ -345,6 +345,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_navx.reset();
+    resetOdometry(new Pose2d(getPose().getTranslation(), m_navx.getRotation2d()));
   }
 
   /**
