@@ -5,6 +5,7 @@
 package frc.robot;
 
 import java.text.BreakIterator;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -58,7 +60,7 @@ public class RobotContainer {
   //The Programer's controller
   private final Joystick m_testingGampad = new Joystick(Constants.UsbPort.kTestingControler);
   
-  SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
   private final SendableChooser<Command> m_pathChooser;
 
   /**
@@ -68,13 +70,14 @@ public class RobotContainer {
     configurePathPlanerChooser();
 
     m_pathChooser = AutoBuilder.buildAutoChooser();
-
+    
     // Configure the button bindings
     configureAutonomousChooser();
     configureBindings();
-   
 
-    SmartDashboard.putData("Auto Chooser", m_pathChooser);
+    SmartDashboard.putData("PathPlaner Chooser", m_pathChooser);
+    SmartDashboard.putData("Simple Auto Chooser", m_AutoChooser);
+    SmartDashboard.putBoolean("Use Path", false);
   }
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -184,17 +187,18 @@ public class RobotContainer {
   }
 
   private void configureAutonomousChooser() {
-    m_AutoChooser.addOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
+    m_AutoChooser.setDefaultOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
     m_AutoChooser.addOption("shoot and back", m_Autos.shootAndMoveCommand(m_Arm, m_InOut, m_robotDrive));
-    m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
-    m_AutoChooser.addOption("Shoot Then Backup While Intaking", getAutonomousCommand());
-    m_AutoChooser.setDefaultOption("Do Nothing", m_Autos.doNothing());
-    SmartDashboard.putData(m_AutoChooser);
+    m_AutoChooser.addOption("Do Nothing", m_Autos.doNothing());
+    // m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
+    // m_AutoChooser.addOption("Shoot Then Backup While Intaking", getAutonomousCommand());
   }
 
   private void configurePathPlanerChooser(){
     NamedCommands.registerCommand("Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
     NamedCommands.registerCommand("SquatAndNomNom", m_Autos.toGroundAndGrabCommand(m_Arm, m_InOut));
+    NamedCommands.registerCommand("ReverseNomNom", m_InOut.reverseCommand());
+    NamedCommands.registerCommand("SquatAndNomNomReverse", m_Autos.toGroundAndGrabAndReverseCommand(m_Arm, m_InOut));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -202,7 +206,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_pathChooser.getSelected();
-    //return m_AutoChooser.getSelected();
+    if (SmartDashboard.getBoolean("Use Path", false)) {
+      return m_pathChooser.getSelected();
+    }
+    return m_AutoChooser.getSelected();
+    
   }
 }

@@ -175,7 +175,6 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("AbsoluteEncoder",  armRotation());
     SmartDashboard.putString("armState", armStateLogic.get().toString());
-    SmartDashboard.putBoolean("InGround Postion", armAngleInGroundRange());
     // This method will be called once per scheduler run
   }
 }
