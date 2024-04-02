@@ -125,14 +125,19 @@ public class InOut extends SubsystemBase {
           new InstantCommand(() -> setShooterRef(kspeed))
       ),
       intoShooter(),
-      new InstantCommand(() -> setShooterRef(0)));
+      new InstantCommand());
     return group;
+  }
+
+  public Command spinUpShooter() {
+    return this.run(() -> setShooterRef(kSetpoint)).withTimeout(16);
   }
   
   public Command intoShooter() {
     return new InstantCommand(() -> m_intake.set(1))
-    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    .andThen(new InstantCommand(() -> m_intake.set(0)));
+    .withTimeout(0.5)  
+    .andThen(() -> m_intake.set(0))
+    .andThen(()-> setShooterRef(0));
   }
 
   public Command intakeCommand(double speed) {

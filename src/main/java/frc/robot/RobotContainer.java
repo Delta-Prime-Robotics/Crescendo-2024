@@ -76,8 +76,8 @@ public class RobotContainer {
     configureBindings();
 
     SmartDashboard.putData("PathPlaner Chooser", m_pathChooser);
-    SmartDashboard.putData("Simple Auto Chooser", m_AutoChooser);
-    SmartDashboard.putBoolean("Use Path", false);
+    //SmartDashboard.putData("Simple Auto Chooser", m_AutoChooser);
+   
   }
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -146,13 +146,14 @@ public class RobotContainer {
     //hook bindings
     JoystickButton hookButtonLT = new JoystickButton(m_driverGamepad, Button.kX); 
     JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kB); 
-    JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kRB);
+    JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kLT);
     
-    new JoystickButton(m_driverGamepad, Button.kLT)
+    new JoystickButton(m_driverGamepad, Button.kLB)
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
       .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
 
-    new JoystickButton(m_driverGamepad, Button.kRT)
+    new JoystickButton(m_driverGamepad, Button.kRB)
+    
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
       .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
     
@@ -199,6 +200,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("SquatAndNomNom", m_Autos.toGroundAndGrabCommand(m_Arm, m_InOut));
     NamedCommands.registerCommand("ReverseNomNom", m_InOut.reverseCommand());
     NamedCommands.registerCommand("SquatAndNomNomReverse", m_Autos.toGroundAndGrabAndReverseCommand(m_Arm, m_InOut));
+    NamedCommands.registerCommand("FeedNote", m_InOut.intoShooter());
+    NamedCommands.registerCommand("RaiseAndSpinUp", m_Autos.speakerAndSpinUp(m_Arm, m_InOut));
+
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -206,10 +210,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    if (SmartDashboard.getBoolean("Use Path", false)) {
       return m_pathChooser.getSelected();
-    }
-    return m_AutoChooser.getSelected();
-    
   }
 }

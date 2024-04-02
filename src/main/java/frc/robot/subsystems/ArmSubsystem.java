@@ -130,6 +130,12 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  public Command getArmInSpeakerCommand(){
+   return this.run(() -> getArmInPositionSpeaker())
+        .until(()-> armAngleInSpeakerRange())
+        .finallyDo(() -> armRun(0));
+  }
+
   public Command getArmInGroundPostion() {
     // if (armAngleInGroundRange())
     // {

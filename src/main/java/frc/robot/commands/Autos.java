@@ -71,7 +71,12 @@ public final class Autos {
     public final Command toGroundAndGrabCommand(ArmSubsystem m_Arm, InOut m_InOut){
         return m_Arm.getArmInGroundPostion()
         .alongWith(m_InOut.intakeCommand(1))
-        .withTimeout(2);
+        .withTimeout(1);
+    }
+
+    public final Command speakerAndSpinUp(ArmSubsystem m_Arm, InOut m_InOut) {
+        return m_Arm.getArmInSpeakerCommand()
+        .andThen(m_InOut.spinUpShooter());
     }
     
     public final Command justShootCommand(ArmSubsystem m_Arm, InOut m_InOut) {
