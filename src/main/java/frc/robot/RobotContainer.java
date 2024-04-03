@@ -206,10 +206,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    if (SmartDashboard.getBoolean("Use Path", false)) {
-      return m_pathChooser.getSelected();
-    }
-    return m_AutoChooser.getSelected();
+    return m_pathChooser.getSelected();
+    //return m_AutoChooser.getSelected();
     
   }
 }
