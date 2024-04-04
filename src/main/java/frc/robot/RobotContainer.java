@@ -148,11 +148,11 @@ public class RobotContainer {
     JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kB); 
     JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kRB);
     
-    new JoystickButton(m_driverGamepad, Button.kLT)
+    new JoystickButton(m_driverGamepad, Button.kRT)
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
       .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
 
-    new JoystickButton(m_driverGamepad, Button.kRT)
+    new JoystickButton(m_driverGamepad, Button.kLT)
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
       .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
     
@@ -177,6 +177,10 @@ public class RobotContainer {
     new JoystickButton(m_testingGampad, Button.kRT)
     .onTrue(m_Arm.getArmInGroundPostion())
     .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+
+    new JoystickButton(m_testingGampad, Button.kB)
+    .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
+    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
     
     // new JoystickButton(m_testingGampad, Button.kR)
     // .onTrue(m_InOut.intakeCommand(1))
@@ -199,6 +203,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("SquatAndNomNom", m_Autos.toGroundAndGrabCommand(m_Arm, m_InOut));
     NamedCommands.registerCommand("ReverseNomNom", m_InOut.reverseCommand());
     NamedCommands.registerCommand("SquatAndNomNomReverse", m_Autos.toGroundAndGrabAndReverseCommand(m_Arm, m_InOut));
+    NamedCommands.registerCommand("SpeakerAndSpinUp", m_Autos.speakerAndSpinUp(m_Arm, m_InOut));
+    NamedCommands.registerCommand("FeedNote", m_InOut.intoShooter());
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

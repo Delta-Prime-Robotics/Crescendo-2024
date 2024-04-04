@@ -57,7 +57,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "top 1.1"
+            "pathName": "top 2.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FeedNote"
           }
         }
       ]

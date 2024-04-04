@@ -18,6 +18,7 @@ import edu.wpi.first.math.MathUtil;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.NeoMotorConstants;
@@ -113,6 +114,11 @@ public class ArmSubsystem extends SubsystemBase {
       m_leader.set(0);
     }
   }
+  public Command armToSpeakerCommand(){
+  return new RunCommand(()-> getArmInPositionSpeaker(), this)
+  .until(()->armAngleInSpeakerRange())
+  .finallyDo(() -> m_leader.stopMotor());
+  }
   
   public void getArmInPositionSpeaker()
   {
@@ -123,7 +129,7 @@ public class ArmSubsystem extends SubsystemBase {
     else
     {
       double speed = .3;
-      if ( this.armRotation() > kMaxSpeakerAngle)
+      if ( this.armRotation() > kMaxSpeakerAngle && this.armRotation() < 0.8)
         speed *= -1.0;
 
       m_leader.set(speed);

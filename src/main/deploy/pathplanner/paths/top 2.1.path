@@ -54,8 +54,8 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Shoot",
-      "waypointRelativePos": 1.9,
+      "name": "Reverse",
+      "waypointRelativePos": 0.45,
       "command": {
         "type": "sequential",
         "data": {
@@ -63,7 +63,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Shoot"
+                "name": "ReverseNomNom"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Speaker And Spin Up",
+      "waypointRelativePos": 1.55,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "SpeakerAndSpinUp"
               }
             }
           ]

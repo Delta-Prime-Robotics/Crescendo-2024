@@ -73,6 +73,7 @@ public final class Autos {
         .alongWith(m_InOut.intakeCommand(1))
         .withTimeout(2);
     }
+
     
     public final Command justShootCommand(ArmSubsystem m_Arm, InOut m_InOut) {
         return new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm)
@@ -80,6 +81,13 @@ public final class Autos {
         .andThen(m_InOut.shootIntoSpeaker())
         .andThen(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
     }
+
+    public final Command speakerAndSpinUp(ArmSubsystem m_Arm, InOut m_InOut) {
+        return m_Arm.armToSpeakerCommand()
+        .andThen(m_InOut.spinUpShooter());
+    }	     
+
+
     
     public final Command shootAndMoveCommand(ArmSubsystem m_Arm, InOut m_InOut, DriveSubsystem m_robotDrive){
         // // An example trajectory to follow. All units in meters.

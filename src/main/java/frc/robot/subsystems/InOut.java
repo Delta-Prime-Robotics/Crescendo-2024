@@ -109,6 +109,11 @@ public class InOut extends SubsystemBase {
     shooterPIDController.setReference(speed, ControlType.kVelocity);
     //NO TOUCHY
   }
+
+  public Command spinUpShooter() {
+    return this.run(() -> setShooterRef(kSetpoint));
+    //.finallyDo(()-> setShooterRef(0));
+  }
   
   private static double shooterVelocity() {
     return -m_Encoder.getVelocity(); 
@@ -132,7 +137,8 @@ public class InOut extends SubsystemBase {
   public Command intoShooter() {
     return new InstantCommand(() -> m_intake.set(1))
     .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    .andThen(new InstantCommand(() -> m_intake.set(0)));
+    .andThen(new InstantCommand(() -> m_intake.set(0)))
+    .andThen(new InstantCommand(()-> setShooterRef(0)));
   }
 
   public Command intakeCommand(double speed) {
@@ -158,7 +164,6 @@ public class InOut extends SubsystemBase {
       .finallyDo(()-> m_intake.stopMotor());
         //This stops the motor at end of command or during a interupt
   }
-  
 
   public Command reverseCommand() {
     return this.runEnd(()->setIntakeSpeed(-0.25), () -> m_intake.stopMotor())
