@@ -3,38 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.821441262835021,
-        "y": 6.756582444281278
+        "x": 1.5,
+        "y": 5.589805823486292
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4695261635688808,
-        "y": 6.812814401649516
+        "x": 2.500000000000001,
+        "y": 5.589805823486292
       },
-      "isLocked": true,
-      "linkedName": "Amp Shoot"
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.8792513425482693,
-        "y": 7.004798511021523
+        "x": 6.6915456907836885,
+        "y": 5.589805823486292
       },
       "prevControl": {
-        "x": 1.0698316500022924,
-        "y": 6.987344301768668
+        "x": 5.6915456907836885,
+        "y": 5.589805823486292
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Spike 1"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -44,14 +38,14 @@
     "maxAngularAcceleration": 180.0
   },
   "goalEndState": {
-    "velocity": 0.0,
+    "velocity": 0,
     "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Top",
+  "folder": null,
   "previewStartingState": {
-    "rotation": -120.0,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

@@ -111,8 +111,8 @@ public class InOut extends SubsystemBase {
   }
 
   public Command spinUpShooter() {
-    return this.run(() -> setShooterRef(kSetpoint));
-    //.finallyDo(()-> setShooterRef(0));
+    return this.run(() -> setShooterRef(kSetpoint))
+    .finallyDo(()-> setShooterRef(0));
   }
   
   private static double shooterVelocity() {
@@ -126,7 +126,7 @@ public class InOut extends SubsystemBase {
     
     SequentialCommandGroup group = new SequentialCommandGroup(
       new ParallelDeadlineGroup(
-          new WaitCommand(1), 
+          new WaitCommand(0.4 ), 
           new InstantCommand(() -> setShooterRef(kspeed))
       ),
       intoShooter(),
@@ -167,7 +167,7 @@ public class InOut extends SubsystemBase {
 
   public Command reverseCommand() {
     return this.runEnd(()->setIntakeSpeed(-0.25), () -> m_intake.stopMotor())
-    .withTimeout(0.5);
+    .withTimeout(0.2);
   }
 
   public Command stopIntake() {

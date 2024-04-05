@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.31,
-      "y": 5.44
+      "x": 0.82,
+      "y": 4.28
     },
-    "rotation": 180.0
+    "rotation": 120.0
   },
   "command": {
     "type": "sequential",
@@ -18,20 +18,20 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "middle 1.0"
+            "waitTime": 3.0
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Shoot"
+            "pathName": "bottom moblity"
           }
         }
       ]
     }
   },
-  "folder": "Middle",
+  "folder": "Source",
   "choreoAuto": false
 }

@@ -30,8 +30,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_follower; //right arm
   private static SparkAbsoluteEncoder m_AbsoluteEncoder;
   private static SparkPIDController m_pidControler;
-  private static double kMaxSpeakerAngle = 0.07;
-  private static double kMinSpeakerAngle = 0.042;
+  private static double kMaxSpeakerAngle = 0.06;
+  private static double kMinSpeakerAngle = 0.03;
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
     m_leader = new CANSparkMax(ArmConstants.kArmLeftCanId, MotorType.kBrushless);
@@ -137,22 +137,11 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public Command getArmInGroundPostion() {
-    // if (armAngleInGroundRange())
-    // {
-    //     m_leader.set(0);
-    // }
-    // else
-    // {
-    //   double speed = -0.3;
-    //   // if ( this.armRotation() > kMaxSpeakerAngle)
-    //   //   speed *= -1.0;
-
-    //   m_leader.set(speed);
-    // }
     return this.run(()-> armRun(-0.3))
     .until(()->armAngleInGroundRange())
     .finallyDo(()-> armRun(0));
   }
+
 
   public boolean armAngleInSpeakerRange()
   {

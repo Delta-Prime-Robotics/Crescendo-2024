@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7533104222834955,
-      "y": 6.7315067018511066
+      "x": 0.8327743151212798,
+      "y": 6.712444649960525
     },
-    "rotation": -120.0
+    "rotation": -120.25643716352927
   },
   "command": {
     "type": "sequential",
@@ -45,30 +45,12 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "top 2.0"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "top 2.1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "FeedNote"
+            "name": "SpinUpAndFeedNote"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "Amp",
   "choreoAuto": false
 }

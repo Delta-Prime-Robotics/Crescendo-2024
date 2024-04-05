@@ -134,14 +134,18 @@ public class RobotContainer {
       .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
       .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
 
-    new JoystickButton(m_operatorGamepad, Button.kRB)
-    .onTrue(new RunCommand(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(true), m_InOut)
-      .alongWith( new ParallelDeadlineGroup(
-              new WaitCommand(.5), 
-              new RunCommand(() -> m_InOut.setIntakeSpeed(.45))
-    )))
-    .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
-    .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
+    // new JoystickButton(m_operatorGamepad, Button.kRB)
+    // .onTrue(new PrintCommand("arm angle  " + String.format("%2.5", m_Arm.armRotation()))
+    // .andThen(new PrintCommand("heading" + String.format("%2.5", m_robotDrive.getHeading().getDegrees()))));
+
+    // new JoystickButton(m_operatorGamepad, Button.kRB)
+    // .onTrue(new RunCommand(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(true), m_InOut)
+    //   .alongWith( new ParallelDeadlineGroup(
+    //           new WaitCommand(.5), 
+    //           new RunCommand(() -> m_InOut.setIntakeSpeed(.45))
+    // )))
+    // .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
+    // .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
     
     //hook bindings
     JoystickButton hookButtonLT = new JoystickButton(m_driverGamepad, Button.kX); 
@@ -204,6 +208,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("ReverseNomNom", m_InOut.reverseCommand());
     NamedCommands.registerCommand("SquatAndNomNomReverse", m_Autos.toGroundAndGrabAndReverseCommand(m_Arm, m_InOut));
     NamedCommands.registerCommand("SpeakerAndSpinUp", m_Autos.speakerAndSpinUp(m_Arm, m_InOut));
+    NamedCommands.registerCommand("SpinUpAndFeedNote", m_InOut.shootIntoSpeaker());
+    NamedCommands.registerCommand("Speaker", m_Arm.armToSpeakerCommand());
     NamedCommands.registerCommand("FeedNote", m_InOut.intoShooter());
   }
   /**

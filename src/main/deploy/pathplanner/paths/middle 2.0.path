@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.31,
+        "x": 1.0,
         "y": 5.44
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.9500000000000011,
+        "x": 0.640000000000001,
         "y": 5.44
       },
       "isLocked": false,
-      "linkedName": "middle shoot"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -48,16 +48,16 @@
     },
     {
       "anchor": {
-        "x": 1.31,
+        "x": 1.0,
         "y": 5.44
       },
       "prevControl": {
-        "x": 4.739938616198726,
+        "x": 4.429938616198726,
         "y": 5.44
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "middle shoot"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -74,6 +74,12 @@
               "type": "named",
               "data": {
                 "name": "SquatAndNomNom"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "ReverseNomNom"
               }
             }
           ]
@@ -93,7 +99,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Middle",
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0.0

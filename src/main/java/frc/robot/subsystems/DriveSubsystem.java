@@ -287,6 +287,8 @@ public class DriveSubsystem extends SubsystemBase {
     setModuleStates(swerveModuleStates);
   }
 
+  
+
   /**
    * Sets the wheels into an X formation to prevent movement.
    */
@@ -357,7 +359,7 @@ public class DriveSubsystem extends SubsystemBase {
   //   return m_navx.getRotation2d().getDegrees();
   // }
 
-  private Rotation2d getHeading() {
+  public Rotation2d getHeading() {
     return Rotation2d.fromDegrees(m_navx.getAngle() * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
   }
 

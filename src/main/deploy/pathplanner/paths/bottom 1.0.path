@@ -3,52 +3,58 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.4408703461281565,
-        "y": 5.5430292057165325
+        "x": 0.82,
+        "y": 4.28
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.0808703461281575,
-        "y": 5.5430292057165325
+        "x": 1.5110352727827958,
+        "y": 3.99940081931446
       },
-      "isLocked": false,
-      "linkedName": "Middle Shoot"
+      "isLocked": true,
+      "linkedName": "Source Shoot"
     },
     {
       "anchor": {
-        "x": 2.9026396514331485,
-        "y": 5.5430292057165325
+        "x": 2.446567628177991,
+        "y": 4.057871591526659
       },
       "prevControl": {
-        "x": 2.2009903848867527,
-        "y": 5.5196408968316515
+        "x": 1.5928943538798759,
+        "y": 4.057871591526659
       },
       "nextControl": {
-        "x": 3.902084558412297,
-        "y": 5.576344035949172
+        "x": 2.7553162705366425,
+        "y": 4.057871591526659
       },
-      "isLocked": false,
-      "linkedName": "Spike 2"
+      "isLocked": true,
+      "linkedName": "Spike 3"
     },
     {
       "anchor": {
-        "x": 1.4408703461281565,
-        "y": 5.5430292057165325
+        "x": 0.82,
+        "y": 4.28
       },
       "prevControl": {
-        "x": 1.6208703461281564,
-        "y": 5.5430292057165325
+        "x": 1.6375461166025953,
+        "y": 4.08145308596794
       },
       "nextControl": null,
-      "isLocked": false,
-      "linkedName": "Middle Shoot"
+      "isLocked": true,
+      "linkedName": "Source Shoot"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 180.0,
+      "rotateFast": true
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "intake",
+      "name": "pickup",
       "waypointRelativePos": 0.0,
       "command": {
         "type": "sequential",
@@ -78,15 +84,15 @@
     "maxAngularAcceleration": 180.0
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -179.31793960682737,
+    "velocity": 0,
+    "rotation": 120.0,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "Middle",
+  "folder": "Bottom",
   "previewStartingState": {
-    "rotation": 180.0,
-    "velocity": 0.0
+    "rotation": 120.0,
+    "velocity": 0
   },
   "useDefaultConstraints": true
 }
