@@ -1,0 +1,74 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7533104222834955,
+      "y": 6.7315067018511066
+    },
+    "rotation": -120.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "top 1.0"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SquatAndNomNom"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "top 1.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "top 2.0"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "top 2.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpinUpAndFeedNote"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Amp",
+  "choreoAuto": false
+}

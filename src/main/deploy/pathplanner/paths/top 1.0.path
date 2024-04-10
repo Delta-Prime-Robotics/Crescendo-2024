@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.821441262835021,
+        "y": 6.756582444281278
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.4695261635688808,
+        "y": 6.812814401649516
+      },
+      "isLocked": true,
+      "linkedName": "Amp Shoot"
+    },
+    {
+      "anchor": {
+        "x": 2.8792513425482693,
+        "y": 7.004798511021523
+      },
+      "prevControl": {
+        "x": 1.0698316500022924,
+        "y": 6.987344301768668
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Spike 1"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 180.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 180.0,
+    "maxAngularAcceleration": 180.0
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 180.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Top",
+  "previewStartingState": {
+    "rotation": -120.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

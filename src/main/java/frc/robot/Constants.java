@@ -66,7 +66,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 14;
     public static final int kRearRightTurningCanId = 16;
 
-    public static final boolean kGyroReversed = false;
+    public static final boolean kGyroReversed = true;
   }
 
   public static final class ModuleConstants {
@@ -175,17 +175,18 @@ public final class Constants {
     //Idle Mode
     public static final IdleMode kArmIdleMode = IdleMode.kBrake;
     //Setpoints in rotations ranging from 0 to 1 and wraping around. 
-    public static final double kAmpPosition = 0.315; 
-    public static final double kSpeakerPosition = 0.07;
+    public static final double kAmpPosition = 0.25; 
+    public static final double kSpeakerPosition = 0.042;
     public static final double kGroundPosition = 0;
     public static final double kErectPosition = 0.2;
   }
 
   /*Usb port Constants for Laptop */
   public final class UsbPort {
-    public static final int kGamePadO = 2;
-    public static final int kGamePadDr = 3;
-    // public static final int kFlightJoystick = 3;
+    public static final int kTestingControler = 1;
+    public static final int kGamePadO = 2; // Change this to kOperatorControler
+    public static final int kGamePadDr = 3;// Change this to kDriveControler
+    // public static final int kFlightJoystick = 4;
   }
   
   /** Constants for the gamepad joysticks & buttons */ 

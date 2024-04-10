@@ -5,9 +5,11 @@
 package frc.robot;
 
 import java.text.BreakIterator;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,11 +18,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import frc.robot.Constants.GamePad.Button;
 import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
@@ -29,7 +34,6 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.IntakeJoystickCommand;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.Dashboard;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HookSubsystem;
 import frc.robot.subsystems.InOut;
@@ -46,7 +50,6 @@ public class RobotContainer {
   private final InOut m_InOut = new InOut();
   private final HookSubsystem m_Hook = new HookSubsystem();
   private final ArmSubsystem m_Arm = new ArmSubsystem();
-  private final Dashboard m_Dashboard = new Dashboard(m_robotDrive, m_InOut, m_Arm);
   private final Autos m_Autos = new Autos();
   public boolean isAutonomous = true;
   
@@ -54,16 +57,27 @@ public class RobotContainer {
   private final Joystick m_driverGamepad = new Joystick(Constants.UsbPort.kGamePadDr);
   //The Operator's controller
   private final Joystick m_operatorGamepad = new Joystick(Constants.UsbPort.kGamePadO);
+  //The Programer's controller
+  private final Joystick m_testingGampad = new Joystick(Constants.UsbPort.kTestingControler);
   
-  SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  private final SendableChooser<Command> m_AutoChooser = new SendableChooser<>();
+  private final SendableChooser<Command> m_pathChooser;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    configurePathPlanerChooser();
+
+    m_pathChooser = AutoBuilder.buildAutoChooser();
     
     // Configure the button bindings
-    configureBindings();
     configureAutonomousChooser();
+    configureBindings();
+
+    SmartDashboard.putData("PathPlaner Chooser", m_pathChooser);
+    SmartDashboard.putData("Simple Auto Chooser", m_AutoChooser);
+    SmartDashboard.putBoolean("Use Path", false);
   }
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -98,8 +112,7 @@ public class RobotContainer {
         () -> -MathUtil.applyDeadband(m_operatorGamepad.getRawAxis(RightStick.kUpDown), 0.05),
         () -> //pass a true when you want to use the intake in a command
         isAutonomous //RobotModeTriggers.autonomous().getAsBoolean();
-        ));
-      
+        )); 
     }
 
     new JoystickButton(m_driverGamepad, Button.kBack)
@@ -121,25 +134,29 @@ public class RobotContainer {
       .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
       .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
 
-      // new JoystickButton(m_operatorGamepad, Button.kRB)
-      // .onTrue(new RunCommand(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(true), m_InOut)
-      //   .alongWith( new ParallelDeadlineGroup(
-      //           new WaitCommand(.5), 
-      //           new RunCommand(() -> m_InOut.setIntakeSpeed(.45))
-      // )))
-      // .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
-      // .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
+    // new JoystickButton(m_operatorGamepad, Button.kRB)
+    // .onTrue(new PrintCommand("arm angle  " + String.format("%2.5", m_Arm.armRotation()))
+    // .andThen(new PrintCommand("heading" + String.format("%2.5", m_robotDrive.getHeading().getDegrees()))));
+
+    // new JoystickButton(m_operatorGamepad, Button.kRB)
+    // .onTrue(new RunCommand(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(true), m_InOut)
+    //   .alongWith( new ParallelDeadlineGroup(
+    //           new WaitCommand(.5), 
+    //           new RunCommand(() -> m_InOut.setIntakeSpeed(.45))
+    // )))
+    // .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
+    // .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
     
     //hook bindings
     JoystickButton hookButtonLT = new JoystickButton(m_driverGamepad, Button.kX); 
     JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kB); 
     JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kRB);
     
-    new JoystickButton(m_driverGamepad, Button.kLT)
+    new JoystickButton(m_driverGamepad, Button.kRT)
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
       .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
 
-    new JoystickButton(m_driverGamepad, Button.kRT)
+    new JoystickButton(m_driverGamepad, Button.kLT)
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
       .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
     
@@ -156,15 +173,44 @@ public class RobotContainer {
         m_Hook.rightHookRunCommand(true),
         reverseTrigger
     ));
+    
+    new JoystickButton(m_testingGampad, Button.kA)
+    .onTrue(m_InOut.intakeCommand(0.4))
+    .onFalse(m_InOut.stopIntake());
+
+    new JoystickButton(m_testingGampad, Button.kRT)
+    .onTrue(m_Arm.getArmInGroundPostion())
+    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+
+    new JoystickButton(m_testingGampad, Button.kB)
+    .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
+    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+    
+    // new JoystickButton(m_testingGampad, Button.kR)
+    // .onTrue(m_InOut.intakeCommand(1))
+    // .onFalse(m_InOut.stopIntake());
+
+    // .onFalse(new InstantCommand( () -> m_InOut.setIntakeSpeed(.0),m_InOut)
+    // .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
   }
 
   private void configureAutonomousChooser() {
-    m_AutoChooser.setDefaultOption("Do Nothing", m_Autos.doNothing());
-    m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
-    m_AutoChooser.addOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
+    m_AutoChooser.setDefaultOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
     m_AutoChooser.addOption("shoot and back", m_Autos.shootAndMoveCommand(m_Arm, m_InOut, m_robotDrive));
-    m_AutoChooser.addOption("really Just Back Up", m_Autos.reallyJustBackUpCommand(m_robotDrive));
-    SmartDashboard.putData(m_AutoChooser);
+    m_AutoChooser.addOption("Do Nothing", m_Autos.doNothing());
+    // m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
+    // m_AutoChooser.addOption("Shoot Then Backup While Intaking", getAutonomousCommand());
+  }
+
+  private void configurePathPlanerChooser(){
+    NamedCommands.registerCommand("Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
+    NamedCommands.registerCommand("SquatAndNomNom", m_Autos.toGroundAndGrabCommand(m_Arm, m_InOut));
+    NamedCommands.registerCommand("ReverseNomNom", m_InOut.reverseCommand());
+    NamedCommands.registerCommand("SquatAndNomNomReverse", m_Autos.toGroundAndGrabAndReverseCommand(m_Arm, m_InOut));
+    NamedCommands.registerCommand("SpeakerAndSpinUp", m_Autos.speakerAndSpinUp(m_Arm, m_InOut));
+    NamedCommands.registerCommand("SpinUpAndFeedNote", m_InOut.shootIntoSpeaker());
+    NamedCommands.registerCommand("Speaker", m_Arm.armToSpeakerCommand());
+    NamedCommands.registerCommand("FeedNote", m_InOut.intoShooter());
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -172,6 +218,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_AutoChooser.getSelected();
+    return m_pathChooser.getSelected();
+    //return m_AutoChooser.getSelected();
+    
   }
 }

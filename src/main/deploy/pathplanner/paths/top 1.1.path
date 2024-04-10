@@ -1,0 +1,87 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.8792513425482693,
+        "y": 7.004798511021523
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.843634926878869,
+        "y": 7.167704464048171
+      },
+      "isLocked": true,
+      "linkedName": "Spike 1"
+    },
+    {
+      "anchor": {
+        "x": 0.82,
+        "y": 6.756582444281278
+      },
+      "prevControl": {
+        "x": 1.188815467526513,
+        "y": 6.830279046885538
+      },
+      "nextControl": null,
+      "isLocked": true,
+      "linkedName": "Amp Shoot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Reverse",
+      "waypointRelativePos": 0.2,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ReverseNomNom"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Speaker",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Speaker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 180.0,
+    "maxAngularAcceleration": 180.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -120.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Top",
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

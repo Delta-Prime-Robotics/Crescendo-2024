@@ -1,0 +1,109 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.281950694955519,
+        "y": 7.449176379834242
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.303806979631944,
+        "y": 7.321178845313305
+      },
+      "isLocked": true,
+      "linkedName": "center 1"
+    },
+    {
+      "anchor": {
+        "x": 3.6797995070121967,
+        "y": 7.103863165912015
+      },
+      "prevControl": {
+        "x": 5.640489013082912,
+        "y": 7.127135444915823
+      },
+      "nextControl": {
+        "x": 3.039830468138712,
+        "y": 7.096267094233991
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.821441262835021,
+        "y": 6.756582444281278
+      },
+      "prevControl": {
+        "x": 1.909420306262986,
+        "y": 7.169665396598849
+      },
+      "nextControl": null,
+      "isLocked": true,
+      "linkedName": "Amp Shoot"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": -120.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [
+    {
+      "name": "Reverse",
+      "waypointRelativePos": 0.45,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "ReverseNomNom"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Speaker",
+      "waypointRelativePos": 1.55,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Speaker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 180.0,
+    "maxAngularAcceleration": 180.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -120.0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Top",
+  "previewStartingState": {
+    "rotation": 180.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

@@ -17,6 +17,8 @@ import edu.wpi.first.math.MathUtil;
 
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.NeoMotorConstants;
@@ -28,8 +30,8 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_follower; //right arm
   private static SparkAbsoluteEncoder m_AbsoluteEncoder;
   private static SparkPIDController m_pidControler;
-  private static double kMaxSpeakerAngle = 0.07;
-  private static double kMinSpeakerAngle = 0.042;
+  private static double kMaxSpeakerAngle = 0.06;
+  private static double kMinSpeakerAngle = 0.03;
   /** Creates a new ArmSubsystem. */
   public ArmSubsystem() {
     m_leader = new CANSparkMax(ArmConstants.kArmLeftCanId, MotorType.kBrushless);
@@ -112,6 +114,11 @@ public class ArmSubsystem extends SubsystemBase {
       m_leader.set(0);
     }
   }
+  public Command armToSpeakerCommand(){
+  return new RunCommand(()-> getArmInPositionSpeaker(), this)
+  .until(()->armAngleInSpeakerRange())
+  .finallyDo(() -> m_leader.stopMotor());
+  }
   
   public void getArmInPositionSpeaker()
   {
@@ -122,20 +129,34 @@ public class ArmSubsystem extends SubsystemBase {
     else
     {
       double speed = .3;
-      if ( this.armRotation() > kMaxSpeakerAngle)
+      if ( this.armRotation() > kMaxSpeakerAngle && this.armRotation() < 0.8)
         speed *= -1.0;
 
       m_leader.set(speed);
     }
   }
 
+  public Command getArmInGroundPostion() {
+    return this.run(()-> armRun(-0.3))
+    .until(()->armAngleInGroundRange())
+    .finallyDo(()-> armRun(0));
+  }
+
+
   public boolean armAngleInSpeakerRange()
   {
     // These need to be constant values that we can update
     return ((this.armRotation() > kMinSpeakerAngle) &&
             (this.armRotation() < kMaxSpeakerAngle));
-
   }
+
+  public boolean armAngleInGroundRange()
+  {
+    // These need to be constant values that we can update
+    return MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(), 0.0005, 0, 1);
+  }
+
+  
   
 //  public Command goToAmp() {
 //  return this.run(()-> setRef(ArmConstants.kAmpPosition));
