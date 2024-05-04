@@ -30,6 +30,7 @@ import frc.robot.Constants.GamePad.Button;
 import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
 import frc.robot.commands.ArmManualMoveCommand;
+import frc.robot.commands.AutoRotateCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.IntakeJoystickCommand;
 import frc.robot.Constants.OIConstants;
@@ -185,6 +186,9 @@ public class RobotContainer {
     new JoystickButton(m_testingGampad, Button.kB)
     .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
     .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+    
+    new JoystickButton(m_testingGampad, Button.kX)
+    .whileTrue(new AutoRotateCommand(m_robotDrive));
     
     // new JoystickButton(m_testingGampad, Button.kR)
     // .onTrue(m_InOut.intakeCommand(1))
