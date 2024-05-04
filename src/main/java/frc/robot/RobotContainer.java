@@ -6,9 +6,12 @@ package frc.robot;
 
 import java.text.BreakIterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -181,14 +184,22 @@ public class RobotContainer {
 
     new JoystickButton(m_testingGampad, Button.kRT)
     .onTrue(m_Arm.getArmInGroundPostion())
-    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+    .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
 
-    new JoystickButton(m_testingGampad, Button.kB)
-    .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
-    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
     
     new JoystickButton(m_testingGampad, Button.kX)
     .whileTrue(new AutoRotateCommand(m_robotDrive));
+
+    new JoystickButton(m_testingGampad, Button.kB)
+    .onTrue(new InstantCommand(
+      () -> m_robotDrive.resetOdometry(
+        new Pose2d(
+          new Random().nextDouble(16),
+          new Random().nextDouble(8.2),
+          new Rotation2d(new Random().nextDouble(360))
+        )
+      )
+    ));
     
     // new JoystickButton(m_testingGampad, Button.kR)
     // .onTrue(m_InOut.intakeCommand(1))
