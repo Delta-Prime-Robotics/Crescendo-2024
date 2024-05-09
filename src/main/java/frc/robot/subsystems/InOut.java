@@ -13,16 +13,17 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-
+import au.grapplerobotics.LaserCan;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkRelativeEncoder;
+
+
 import com.revrobotics.CANSparkBase.ControlType;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
@@ -31,6 +32,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class InOut extends SubsystemBase {
@@ -49,10 +51,11 @@ public class InOut extends SubsystemBase {
   private static final double kMaxOutput = 1;
   private static final double kMaxRPM = 4800;
   public static DigitalInput m_LimitSwitch = new DigitalInput(0);
-
+  public static LaserCan lc = new LaserCan(24);
   //intake
   private final CANSparkMax m_intake;
   public SparkLimitSwitch m_bbLimitSwitch;
+ 
 
   //IR Beam Break public static DigitalInput bbInput = new DigitalInput(Constants.InOutConstants.kBeamBreakDIO);
   
@@ -97,9 +100,28 @@ public class InOut extends SubsystemBase {
    
   }
 
-  public boolean IsNoteInIntake() {
-    return !m_LimitSwitch.get();
+  // public boolean IsNoteInIntake() {
+  //   return !m_LimitSwitch.get();
+  // }
+
+  public boolean IsNoteInIntake(){
+    if (distanceSensor() < 200) {
+      return true;
+    }
+    return false;
   }
+
+  public double distanceSensor(){
+    LaserCan.Measurement measurement = lc.getMeasurement();
+    if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
+      return measurement.distance_mm;
+    } else {
+      DataLogManager.log("Oh no! The target is out of range, or we can't get a reliable measurement!");
+      // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurement.
+      return measurement.distance_mm;
+    }
+  }
+  
 
    /**
    * sets the Velocity setpoint of the PIDControler to inputed speed
@@ -126,7 +148,7 @@ public class InOut extends SubsystemBase {
     
     SequentialCommandGroup group = new SequentialCommandGroup(
       new ParallelDeadlineGroup(
-          new WaitCommand(0.4 ), 
+          new WaitCommand(0.4), 
           new InstantCommand(() -> setShooterRef(kspeed))
       ),
       intoShooter(),
@@ -142,27 +164,21 @@ public class InOut extends SubsystemBase {
   }
 
   public Command intakeCommand(double speed) {
-    
     return new RunCommand(()-> setIntakeSpeed(speed), this)
     .finallyDo(()-> m_intake.stopMotor());
     //This stops the motor at end of command or during a interupt
   }
 
   public Command autoIntakeCommand(double speed) {
-    
       return new InstantCommand(()-> setIntakeSpeed(speed), this)
         // Sets Motor speed
         // .unless(()-> IsNoteInIntake()) //this might need 
         //This will only run the command
         //if the note is not in the intake 
-      .andThen(
-        new WaitUntilCommand(
-          ()-> IsNoteInIntake()
-        )
-      )
-        //This will stop the command when the note is in the Intake
+      .andThen(new WaitUntilCommand(()-> IsNoteInIntake()))
+      //This will stop the command when the note is in the Intake
       .finallyDo(()-> m_intake.stopMotor());
-        //This stops the motor at end of command or during a interupt
+      //This stops the motor at end of command or during a interupt
   }
 
   public Command reverseCommand() {
@@ -199,6 +215,7 @@ public class InOut extends SubsystemBase {
     // if((noteState != IsNoteInIntake)) { noteState = IsNoteInIntake;}
     SmartDashboard.putBoolean("IsNoteInIntake", IsNoteInIntake());
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
+    SmartDashboard.putNumber("mm distance", distanceSensor());
   }
   
 }

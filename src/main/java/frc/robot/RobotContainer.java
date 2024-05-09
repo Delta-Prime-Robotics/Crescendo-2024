@@ -175,7 +175,8 @@ public class RobotContainer {
     ));
     
     new JoystickButton(m_testingGampad, Button.kA)
-    .onTrue(m_InOut.intakeCommand(0.4))
+    //.onTrue(m_InOut.intakeCommand(0.4))
+    .onTrue(m_InOut.autoIntakeCommand(1).andThen(m_InOut.reverseCommand()))
     .onFalse(m_InOut.stopIntake());
 
     new JoystickButton(m_testingGampad, Button.kRT)
