@@ -24,6 +24,8 @@ public class AutoRotateCommand extends Command {
   final double targetY = 5.55; 
   double targetAngleRadians;
 
+  double angleDifference;
+
   //PID turing Control
   static final PIDController turningControler = 
   new PIDController(
@@ -92,14 +94,13 @@ public class AutoRotateCommand extends Command {
 
     // Calculate the angle to turn to
     targetAngleRadians = calculateAngle(robotX, robotY, targetX, targetY);
+    angleDifference = calculateAngleDifference(robotAngleRadians, targetAngleRadians);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     // Calculate the angle angle
-    double angleDifference = calculateAngleDifference(robotAngleRadians, targetAngleRadians);
-
     m_drive.resetOdometry(new Pose2d(robotX,robotY, new Rotation2d(targetAngleRadians)));
 
     new PIDCommand(
