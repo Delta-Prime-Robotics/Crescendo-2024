@@ -94,9 +94,9 @@ public class RobotContainer {
       // Turning is controlled by the X axis of the right stick.
     new RunCommand(
         () -> m_robotDrive.drive(
-            -MathUtil.applyDeadband(m_driverGamepad.getLeftX(), OIConstants.kDriveDeadband),
             -MathUtil.applyDeadband(m_driverGamepad.getLeftY(), OIConstants.kDriveDeadband),
-            -MathUtil.applyDeadband(m_driverGamepad.getRightY(), OIConstants.kDriveDeadband),
+            -MathUtil.applyDeadband(m_driverGamepad.getLeftX(), OIConstants.kDriveDeadband),
+            -MathUtil.applyDeadband(m_driverGamepad.getRightX(), OIConstants.kDriveDeadband),
             true, true),
         m_robotDrive));
       
@@ -114,7 +114,7 @@ public class RobotContainer {
         )); 
     }
 
-    if (m_Hook != null && m_operatorGamepad != null) {
+    if (m_Hook != null && m_driverGamepad != null) {
         m_Hook.setDefaultCommand(
           new RunCommand( 
             ()->m_Hook.runBothHooks(
@@ -129,7 +129,7 @@ public class RobotContainer {
       .onTrue(new InstantCommand(
         () -> m_robotDrive.zeroHeading(),
         m_robotDrive));
-    
+
     // new JoystickButton(m_operatorGamepad, Button.kLT)
     // .onTrue(m_InOut.shootIntoSpeaker());
     
@@ -141,9 +141,21 @@ public class RobotContainer {
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
 
     new JoystickButton(m_operatorGamepad, Button.kRightBumper.value)
-      .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
-      .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+    .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
+    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
 
+    new JoystickButton(m_testingGampad, Button.kA.value)
+    //.onTrue(m_InOut.intakeCommand(0.4))
+    .onTrue(m_InOut.autoIntakeCommand(1).andThen(m_InOut.reverseCommand()))
+    .onFalse(m_InOut.stopIntake());
+
+    new JoystickButton(m_testingGampad, Button.kLeftBumper.value)
+    .onTrue(m_Arm.getArmInGroundPostion())
+    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+
+    new JoystickButton(m_testingGampad, Button.kB.value)
+    .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
+    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));  
     // new JoystickButton(m_operatorGamepad, Button.kRB)
     // .onTrue(new PrintCommand("arm angle  " + String.format("%2.5", m_Arm.armRotation()))
     // .andThen(new PrintCommand("heading" + String.format("%2.5", m_robotDrive.getHeading().getDegrees()))));
@@ -183,19 +195,6 @@ public class RobotContainer {
     //     m_Hook.rightHookRunCommand(true),
     //     reverseTrigger
     // ));
-    
-    new JoystickButton(m_testingGampad, Button.kA.value)
-    //.onTrue(m_InOut.intakeCommand(0.4))
-    .onTrue(m_InOut.autoIntakeCommand(1).andThen(m_InOut.reverseCommand()))
-    .onFalse(m_InOut.stopIntake());
-
-    new JoystickButton(m_testingGampad, Button.kLeftBumper.value)
-    .onTrue(m_Arm.getArmInGroundPostion())
-    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
-
-    new JoystickButton(m_testingGampad, Button.kB.value)
-    .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
-    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
     
     // new JoystickButton(m_testingGampad, Button.kR)
     // .onTrue(m_InOut.intakeCommand(1))
