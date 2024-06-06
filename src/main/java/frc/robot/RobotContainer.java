@@ -164,19 +164,19 @@ public class RobotContainer {
       .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
       .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
     
-    hookButtonLT.whileTrue(
-      new ConditionalCommand(
-        m_Hook.leftHookRunCommand(false),
-        m_Hook.leftHookRunCommand(true),
-        reverseTrigger
-    ));
+    // hookButtonLT.whileTrue(
+    //   new ConditionalCommand(
+    //     m_Hook.leftHookRunCommand(false),
+    //     m_Hook.leftHookRunCommand(true),
+    //     reverseTrigger
+    // ));
     
-    hookButtonRT.whileTrue(
-      new ConditionalCommand(
-        m_Hook.rightHookRunCommand(false),
-        m_Hook.rightHookRunCommand(true),
-        reverseTrigger
-    ));
+    // hookButtonRT.whileTrue(
+    //   new ConditionalCommand(
+    //     m_Hook.rightHookRunCommand(false),
+    //     m_Hook.rightHookRunCommand(true),
+    //     reverseTrigger
+    // ));
     
     new JoystickButton(m_testingGampad, Button.kA)
     .onTrue(m_InOut.intakeCommand(0.4))
@@ -187,8 +187,9 @@ public class RobotContainer {
     .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
 
     
-    new JoystickButton(m_testingGampad, Button.kX)
-    .whileTrue(new AutoRotateCommand(m_robotDrive));
+    new JoystickButton(m_driverGamepad, Button.kA)
+    .whileTrue(new AutoRotateCommand(m_robotDrive).turnCommand())
+    .onFalse(new InstantCommand(()->m_robotDrive.drive(0,0,0,true,true)));
 
     new JoystickButton(m_testingGampad, Button.kB)
     .onTrue(new InstantCommand(

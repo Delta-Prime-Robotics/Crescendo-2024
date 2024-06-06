@@ -12,9 +12,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class AutoRotateCommand extends Command {
+public class AutoRotateCommand{
   private final DriveSubsystem m_drive;
   // Robot's current position and angle
   double robotX;  
@@ -37,13 +38,23 @@ public class AutoRotateCommand extends Command {
 
   /** Creates a new AutoRotateCommand. 
    * @param m_drive */
-  public AutoRotateCommand (DriveSubsystem driveSubsystem) {
+  public AutoRotateCommand(DriveSubsystem driveSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_drive = driveSubsystem;
     m_drive.resetOdometry(new Pose2d(robotX, robotY, new Rotation2d()));
-    addRequirements(m_drive);
     turningControler.enableContinuousInput(-1 * Math.PI, Math.PI);
     turningControler.setTolerance(0.0349066, 0.1);
+    robotX = m_drive.getPose().getX();
+    robotY = m_drive.getPose().getY();
+    robotAngleRadians = m_drive.getPose().getRotation().getRadians();
+    if (onRedSide()) {
+      targetX = 16.54;
+    } else {
+      targetX = 0.0;
+    }
+    // Calculate the angle to turn to
+    targetAngleRadians = calculateAngle(robotX, robotY, targetX, targetY);
+    angleDifference = calculateAngleDifference(robotAngleRadians, targetAngleRadians);
   }
 
   public boolean onRedSide(){
@@ -78,32 +89,9 @@ public class AutoRotateCommand extends Command {
     }
     return difference;
   }
-  
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() { 
-    robotX = m_drive.getPose().getX();
-    robotY = m_drive.getPose().getY();
-    robotAngleRadians = m_drive.getPose().getRotation().getRadians();
-    if (onRedSide()) {
-      targetX = 16.54;
-    } else {
-      targetX = 0.0;
-    }
-
-    // Calculate the angle to turn to
-    targetAngleRadians = calculateAngle(robotX, robotY, targetX, targetY);
-    angleDifference = calculateAngleDifference(robotAngleRadians, targetAngleRadians);
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    // Calculate the angle angle
-    m_drive.resetOdometry(new Pose2d(robotX,robotY, new Rotation2d(targetAngleRadians)));
-
-    new PIDCommand(
+  public Command turnCommand(){
+   return new PIDCommand(
         turningControler, 
         () -> robotAngleRadians, 
         targetAngleRadians, 
@@ -114,19 +102,33 @@ public class AutoRotateCommand extends Command {
             true,
             true
         ),
-        m_drive);
-    System.out.println("Target angle: " + Math.toDegrees(targetAngleRadians) + " degrees");
+        m_drive).until(()-> robotAngleRadians == targetAngleRadians);
+    
+  }
+  
+
+  // // Called when the command is initially scheduled.
+  // @Override
+  // public void initialize() { 
+  // }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  // @Override
+  // public void execute() {
+  //   // Calculate the angle angle
+  //m_drive.resetOdometry(new Pose2d(robotX,robotY, new Rotation2d(targetAngleRadians)));
+    //System.out.println("Target angle: " + Math.toDegrees(targetAngleRadians) + " degrees");
     //System.out.println("Angle difrence: " + Math.toDegrees(angleDifference) + " degrees");
-  }
+  // // }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-  }
+  // // Called once the command ends or is interrupted.
+  // @Override
+  // public void end(boolean interrupted) {
+  // }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+  // // Returns true when the command should end.
+  // @Override
+  // public boolean isFinished() {
+  //   return false;
+  // }
 }
