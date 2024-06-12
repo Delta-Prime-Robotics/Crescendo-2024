@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -56,6 +58,20 @@ public class RobotContainer {
   private final ArmSubsystem m_Arm = new ArmSubsystem();
   private final Autos m_Autos = new Autos();
   public boolean isAutonomous = true;
+
+  static final PIDController turningControler = 
+  new PIDController(
+    0.1,
+    0,
+    0
+  );
+  private double targetX = 0;
+  private final double targetY = 5.55;
+  private double robotX = m_robotDrive.getPose().getX();
+  private double robotY = m_robotDrive.getPose().getY();
+  private double robotAngleRadians = m_robotDrive.getPose().getRotation().getRadians();
+  // Calculate the angle to turn to
+  private double targetAngleRadians = AutoRotateCommand.calculateAngle(robotX, robotY, targetX, targetY);
   
   // The driver's controller
   private final Joystick m_driverGamepad = new Joystick(Constants.UsbPort.kGamePadDr);
@@ -190,6 +206,11 @@ public class RobotContainer {
     new JoystickButton(m_driverGamepad, Button.kA)
     .whileTrue(new AutoRotateCommand(m_robotDrive).turnCommand())
     .onFalse(new InstantCommand(()->m_robotDrive.drive(0,0,0,true,true)));
+    // new JoystickButton(m_driverGamepad, Button.kA)
+    // .whileTrue(new PIDCommand(
+    //   turningControler,
+    //   () -> robotAngleRadians,
+    //   targetAngleRadians, (output) -> m_robotDrive.drive(0,0,output,true, true), m_robotDrive));
 
     new JoystickButton(m_testingGampad, Button.kB)
     .onTrue(new InstantCommand(

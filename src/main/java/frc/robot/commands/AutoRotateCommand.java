@@ -44,20 +44,10 @@ public class AutoRotateCommand{
     m_drive.resetOdometry(new Pose2d(robotX, robotY, new Rotation2d()));
     turningControler.enableContinuousInput(-1 * Math.PI, Math.PI);
     turningControler.setTolerance(0.0349066, 0.1);
-    robotX = m_drive.getPose().getX();
-    robotY = m_drive.getPose().getY();
-    robotAngleRadians = m_drive.getPose().getRotation().getRadians();
-    if (onRedSide()) {
-      targetX = 16.54;
-    } else {
-      targetX = 0.0;
-    }
-    // Calculate the angle to turn to
-    targetAngleRadians = calculateAngle(robotX, robotY, targetX, targetY);
     angleDifference = calculateAngleDifference(robotAngleRadians, targetAngleRadians);
   }
 
-  public boolean onRedSide(){
+  public static boolean onRedSide(){
     var alliance = DriverStation.getAlliance();
       if (alliance.isPresent()) {
         return alliance.get() == DriverStation.Alliance.Red;
@@ -67,6 +57,12 @@ public class AutoRotateCommand{
 
   // Function to calculate the angle between two points
   public static double calculateAngle(double currentX, double currentY, double targetX, double targetY) {
+    if (onRedSide()) {
+      targetX = 16.54;
+    } else {
+      targetX = 0.0;
+    }
+    
     double angle = Math.atan2(targetY - currentY, targetX - currentX);
     while (angle > Math.PI) {
       angle -= 2 * Math.PI;
