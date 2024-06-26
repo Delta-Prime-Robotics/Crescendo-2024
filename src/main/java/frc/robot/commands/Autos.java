@@ -50,6 +50,14 @@ public final class Autos {
     .withTimeout(0.5);
     }
 
+    public final Command intakeWhileShooting(InOut m_InOut){
+        return new ParallelCommandGroup(
+            m_InOut.intakeCommand(1),
+            new RunCommand(() -> m_InOut.setShooterRef(1500))  
+        );
+        
+    }
+
     public final Command backupWithGroundAndGrabCommand(ArmSubsystem m_Arm, InOut m_InOut, DriveSubsystem m_drive){
         return new ParallelCommandGroup( 
             m_Arm.getArmInGroundPostion(),

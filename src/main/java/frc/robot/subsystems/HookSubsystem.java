@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -86,11 +87,15 @@ public class HookSubsystem extends SubsystemBase {
     );
   }
 
-  public Command runBothAsCommandTest() {
-    return this.startEnd(
-      () -> voidHookRun(0.5), 
-      () -> m_left.stopMotor()
-    );
+  public void runBothHooks(DoubleSupplier leftHookStick, DoubleSupplier rightHookStick, boolean reverse) {
+    double leftHook = leftHookStick.getAsDouble();
+    double rightHook = rightHookStick.getAsDouble();
+    if(!reverse){
+      leftHook *= -1;
+      rightHook *= -1;
+    }
+    leftRun(leftHook);
+    rightRun(rightHook);
   }
   
 

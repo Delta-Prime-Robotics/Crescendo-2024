@@ -1,0 +1,31 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7976918517978996,
+      "y": 4.280060525939776
+    },
+    "rotation": 117.69947280877402
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "into middle"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Shoot all"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Source",
+  "choreoAuto": false
+}

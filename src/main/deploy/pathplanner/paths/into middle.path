@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.7286953254708481,
-        "y": 2.794959335517481
+        "x": 0.7636315173703657,
+        "y": 2.7104300300527076
       },
       "isLocked": false,
       "linkedName": "Source Shoot"
     },
     {
       "anchor": {
-        "x": 2.9260279603180286,
-        "y": 0.8068966565283563
+        "x": 6.106837968661692,
+        "y": 0.877061583182996
       },
       "prevControl": {
-        "x": 2.177602076001872,
-        "y": 1.4500751508625531
+        "x": 0.3065373652114809,
+        "y": 0.935532355395195
       },
       "nextControl": null,
       "isLocked": false,
@@ -38,14 +38,14 @@
     "maxAngularAcceleration": 180.0
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 178.72696997994322,
+    "velocity": 4.0,
+    "rotation": 178.8542371618248,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Bottom",
   "previewStartingState": {
-    "rotation": 120.0,
+    "rotation": 121.66513929241216,
     "velocity": 0
   },
   "useDefaultConstraints": true
