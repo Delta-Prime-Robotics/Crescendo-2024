@@ -13,6 +13,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -35,14 +37,15 @@ import frc.robot.Constants.GamePad.Button;
 import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
 import frc.robot.commands.ArmManualMoveCommand;
-import frc.robot.commands.AutoRotateCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.IntakeJoystickCommand;
+import frc.robot.commands.TurnToAngleCommand;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HookSubsystem;
 import frc.robot.subsystems.InOut;
+import frc.utils.SpeakerRotateUtil;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -57,21 +60,8 @@ public class RobotContainer {
   private final HookSubsystem m_Hook = new HookSubsystem();
   private final ArmSubsystem m_Arm = new ArmSubsystem();
   private final Autos m_Autos = new Autos();
+  private final SpeakerRotateUtil m_RotateUtil = new SpeakerRotateUtil(m_robotDrive);
   public boolean isAutonomous = true;
-
-  static final PIDController turningControler = 
-  new PIDController(
-    0.1,
-    0,
-    0
-  );
-  private double targetX = 0;
-  private final double targetY = 5.55;
-  private double robotX = m_robotDrive.getPose().getX();
-  private double robotY = m_robotDrive.getPose().getY();
-  private double robotAngleRadians = m_robotDrive.getPose().getRotation().getRadians();
-  // Calculate the angle to turn to
-  private double targetAngleRadians = AutoRotateCommand.calculateAngle(robotX, robotY, targetX, targetY);
   
   // The driver's controller
   private final Joystick m_driverGamepad = new Joystick(Constants.UsbPort.kGamePadDr);
@@ -88,16 +78,12 @@ public class RobotContainer {
    */
   public RobotContainer() {
     configurePathPlanerChooser();
-
     m_pathChooser = AutoBuilder.buildAutoChooser();
     
     // Configure the button bindings
-    configureAutonomousChooser();
+    //configureAutonomousChooser();
     configureBindings();
-
     SmartDashboard.putData("PathPlaner Chooser", m_pathChooser);
-    SmartDashboard.putData("Simple Auto Chooser", m_AutoChooser);
-    SmartDashboard.putBoolean("Use Path", false);
   }
   /**
    * Use this method to define your button->command mappings. Buttons can be
@@ -202,15 +188,16 @@ public class RobotContainer {
     .onTrue(m_Arm.getArmInGroundPostion())
     .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
 
-    
-    new JoystickButton(m_driverGamepad, Button.kA)
-    .whileTrue(new AutoRotateCommand(m_robotDrive).turnCommand())
-    .onFalse(new InstantCommand(()->m_robotDrive.drive(0,0,0,true,true)));
-    // new JoystickButton(m_driverGamepad, Button.kA)
-    // .whileTrue(new PIDCommand(
-    //   turningControler,
-    //   () -> robotAngleRadians,
-    //   targetAngleRadians, (output) -> m_robotDrive.drive(0,0,output,true, true), m_robotDrive));
+    new JoystickButton(m_testingGampad, Button.kX)
+    .whileTrue(new TurnToAngleCommand(
+      m_RotateUtil
+        .returnSpeakerAngle(DriverStation.getAlliance().get() == DriverStation.Alliance.Red),
+      m_robotDrive));
+    // new JoystickButton(m_testingGampad, Button.kY)
+    // .onTrue(new InstantCommand(()->m_robotDrive.resetOdometry(
+    //   new Pose2d(new Translation2d(0,0), 
+    //   new Rotation2d(m_RotateUtil.returnSpeakerAngle(m_robotDrive)))
+    //   )));
 
     new JoystickButton(m_testingGampad, Button.kB)
     .onTrue(new InstantCommand(
@@ -231,13 +218,13 @@ public class RobotContainer {
     // .andThen(() -> m_InOut.m_bbLimitSwitch.enableLimitSwitch(false)));
   }
 
-  private void configureAutonomousChooser() {
-    m_AutoChooser.setDefaultOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
-    m_AutoChooser.addOption("shoot and back", m_Autos.shootAndMoveCommand(m_Arm, m_InOut, m_robotDrive));
-    m_AutoChooser.addOption("Do Nothing", m_Autos.doNothing());
-    // m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
-    // m_AutoChooser.addOption("Shoot Then Backup While Intaking", getAutonomousCommand());
-  }
+  // private void configureAutonomousChooser() {
+  //   m_AutoChooser.setDefaultOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
+  //   m_AutoChooser.addOption("shoot and back", m_Autos.shootAndMoveCommand(m_Arm, m_InOut, m_robotDrive));
+  //   m_AutoChooser.addOption("Do Nothing", m_Autos.doNothing());
+  //   // m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
+  //   // m_AutoChooser.addOption("Shoot Then Backup While Intaking", getAutonomousCommand());
+  // }
 
   private void configurePathPlanerChooser(){
     NamedCommands.registerCommand("Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));

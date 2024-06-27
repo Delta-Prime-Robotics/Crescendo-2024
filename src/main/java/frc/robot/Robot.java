@@ -11,9 +11,12 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.utils.SpeakerRotateUtil;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -98,6 +101,10 @@ public class Robot extends TimedRobot {
       m_robotContainer.isAutonomous = false;
     }
     m_robotContainer.isAutonomous = false;
+    boolean alliance = DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+    // SpeakerRotateUtil.onRedSide = alliance;
+    // SmartDashboard.putBoolean("red", alliance);
+    //SmartDashboard.putBoolean("red", DriverStation.getAlliance().get() == DriverStation.Alliance.Red);
   }
 
   /** This function is called periodically during operator control. */

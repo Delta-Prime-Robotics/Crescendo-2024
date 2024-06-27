@@ -363,6 +363,11 @@ public class DriveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(m_navx.getAngle() * (DriveConstants.kGyroReversed ? -1.0 : 1.0));
   }
 
+  // public Rotation2d getHeading(){
+  //   return getPose().getRotation();
+  // }
+
+
   /**
    * Returns the turn rate of the robot.
    *
