@@ -101,10 +101,6 @@ public class Robot extends TimedRobot {
       m_robotContainer.isAutonomous = false;
     }
     m_robotContainer.isAutonomous = false;
-    boolean alliance = DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
-    // SpeakerRotateUtil.onRedSide = alliance;
-    // SmartDashboard.putBoolean("red", alliance);
-    //SmartDashboard.putBoolean("red", DriverStation.getAlliance().get() == DriverStation.Alliance.Red);
   }
 
   /** This function is called periodically during operator control. */

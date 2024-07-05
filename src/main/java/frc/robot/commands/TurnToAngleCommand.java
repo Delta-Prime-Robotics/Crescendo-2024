@@ -7,21 +7,17 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class TurnToAngleCommand extends PIDCommand {
-  /** Creates a new TurnToAngleCommand. */
-  public TurnToAngleCommand(double targetAngleDegrees, DriveSubsystem drive) {
+  /** Creates a new TurnToAngleCommand. Will */
+  public TurnToAngleCommand(double targetAngleRadians, DriveSubsystem drive) {
     super(
-        new PIDController(0.5, 0, 0),
+        new PIDController(0.5, 0, 0), //tune please
         // Close loop on heading
         () -> drive.getPose().getRotation().getRadians(),
         // Set reference to target
-        targetAngleDegrees,
+        targetAngleRadians,
         // Pipe output to turn robot
         output -> drive.drive(0, 0, output, true, true),
         // Require the drive
@@ -39,4 +35,5 @@ public class TurnToAngleCommand extends PIDCommand {
   public boolean isFinished() {
     return false;
   }
+
 }
