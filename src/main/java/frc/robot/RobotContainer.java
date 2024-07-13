@@ -189,16 +189,7 @@ public class RobotContainer {
     .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
 
     new JoystickButton(m_testingGampad, Button.kX)
-    .whileTrue(new InstantCommand(()->m_RotateUtil.returnSpeakerAngle()));
-    // (new TurnToAngleCommand(
-    //   m_RotateUtil
-    //     .returnSpeakerAngle(),
-    //   m_robotDrive));
-    // new JoystickButton(m_testingGampad, Button.kY)
-    // .onTrue(new InstantCommand(()->m_robotDrive.resetOdometry(
-    //   new Pose2d(new Translation2d(0,0), 
-    //   new Rotation2d(m_RotateUtil.returnSpeakerAngle(m_robotDrive)))
-    //   )));
+    .whileTrue(new TurnToAngleCommand(m_RotateUtil.returnSpeakerAngle(), m_robotDrive));
 
     new JoystickButton(m_testingGampad, Button.kB)
     .onTrue(new InstantCommand(
