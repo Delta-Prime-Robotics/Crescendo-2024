@@ -49,7 +49,6 @@ public class SpeakerRotateUtil{
   }
 
   public double returnSpeakerAngle(){
-  
   robotX = m_drive.getPose().getX();
   robotY = m_drive.getPose().getY();
   
@@ -66,8 +65,6 @@ public class SpeakerRotateUtil{
       //return m_drive.getPose().getRotation().getRadians();
     }
     double angle = calculateAngle(robotY, robotX, targetX, targetY);
-    SmartDashboard.putNumber("SpeakerAngle", calculateAngle(robotY, robotX, targetX, targetY));
-    m_drive.resetOdometry(new Pose2d(robotX, robotY, new Rotation2d(angle)));
     return calculateAngle(robotX, robotY, targetX, targetY);
   }
 
