@@ -174,9 +174,9 @@ public class RobotContainer {
         reverseTrigger
     ));
     
-    new JoystickButton(m_testingGampad, Button.kA)
+    new JoystickButton(m_operatorGamepad, Button.kA)
     //.onTrue(m_InOut.intakeCommand(0.4))
-    .onTrue(m_InOut.autoIntakeCommand(1).andThen(m_InOut.reverseCommand()))
+    .onTrue(m_InOut.autoIntakeCommand())
     .onFalse(m_InOut.stopIntake());
 
     new JoystickButton(m_testingGampad, Button.kRT)

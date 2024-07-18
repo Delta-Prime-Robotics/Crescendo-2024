@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
@@ -153,7 +154,8 @@ public class InOut extends SubsystemBase {
       ),
       intoShooter(),
       new InstantCommand(() -> setShooterRef(0)));
-    return group;
+    return group; //I would update this but im lazy
+    //I could make it lot better by not using wait commands
   }
   
   public Command intoShooter() {
@@ -169,16 +171,19 @@ public class InOut extends SubsystemBase {
     //This stops the motor at end of command or during a interupt
   }
 
-  public Command autoIntakeCommand(double speed) {
-      return new InstantCommand(()-> setIntakeSpeed(speed), this)
-        // Sets Motor speed
-        // .unless(()-> IsNoteInIntake()) //this might need 
-        //This will only run the command
-        //if the note is not in the intake 
-      .andThen(new WaitUntilCommand(()-> IsNoteInIntake()))
-      //This will stop the command when the note is in the Intake
-      .finallyDo(()-> m_intake.stopMotor());
-      //This stops the motor at end of command or during a interupt
+  public Command autoIntakeCommand() {
+    double speed = 1;
+    // Sets Motor speed
+    // return new InstantCommand(()-> setIntakeSpeed(speed), this)
+    return this.runOnce(()-> setIntakeSpeed(speed))
+    .andThen(new WaitUntilCommand(()-> IsNoteInIntake()))
+    .andThen(()-> stopIntake())
+    //This will stop the command when the note is in the Intake
+    //reverse a bit
+    .andThen(this.runOnce(()->setIntakeSpeed(-0.15)))
+    .andThen(Commands.waitSeconds(0.15))
+    //This stops the motor at end of command or during a interupt
+    .finallyDo(()-> m_intake.stopMotor());
   }
 
   public Command reverseCommand() {
