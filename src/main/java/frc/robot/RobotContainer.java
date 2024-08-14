@@ -126,7 +126,7 @@ public class RobotContainer {
             ()->m_Hook.runBothHooks(
               () -> -MathUtil.applyDeadband(m_driverGamepad.getLeftTriggerAxis(), 0.05),
               () -> -MathUtil.applyDeadband(m_driverGamepad.getRightTriggerAxis(),0.05),
-              m_driverGamepad.getRightBumper())
+              m_driverGamepad.getYButton())
               , m_Hook));
     }
 
@@ -180,13 +180,13 @@ public class RobotContainer {
     // JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kB.value); 
     // JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kRightBumper.value);
     
-    // new JoystickButton(m_driverGamepad, Button.kRT)
-    //   .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
-    //   .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
+    new JoystickButton(m_driverGamepad, Button.kRightBumper.value)
+      .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
+      .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
 
-    // new JoystickButton(m_driverGamepad, Button.kLT)
-    //   .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
-    //   .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
+    new JoystickButton(m_driverGamepad, Button.kLeftBumper.value)
+      .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
+      .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
     
     // hookButtonLT.whileTrue(
     //   new ConditionalCommand(
