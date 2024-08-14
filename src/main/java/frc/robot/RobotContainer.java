@@ -150,10 +150,18 @@ public class RobotContainer {
     .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
     .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
 
-    new JoystickButton(m_testingGampad, Button.kA.value)
-    //.onTrue(m_InOut.intakeCommand(0.4))
-    .onTrue(m_InOut.autoIntakeCommand(1).andThen(m_InOut.reverseCommand()))
+    new JoystickButton(m_operatorGamepad, Button.kA.value)
+    .onTrue(m_InOut.autoIntakeCommand())
     .onFalse(m_InOut.stopIntake());
+
+    new JoystickButton(m_driverGamepad, Button.kRightBumper.value)
+    .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
+    .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
+
+  new JoystickButton(m_driverGamepad, Button.kLeftBumper.value)
+    .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
+    .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
+
 
     new JoystickButton(m_testingGampad, Button.kLeftBumper.value)
     .onTrue(m_Arm.getArmInGroundPostion())
@@ -161,7 +169,24 @@ public class RobotContainer {
 
     new JoystickButton(m_testingGampad, Button.kB.value)
     .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
-    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));  
+    .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm)); 
+
+    new JoystickButton(m_testingGampad, Button.kRightBumper.value)
+    .onTrue(m_Arm.getArmInGroundPostion())
+    .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
+
+
+    new JoystickButton(m_testingGampad, Button.kB.value)
+    .onTrue(new InstantCommand(
+      () -> m_robotDrive.resetOdometry(
+        new Pose2d(
+          new Random().nextDouble(16),
+          new Random().nextDouble(8.2),
+          new Rotation2d(new Random().nextDouble(360))
+        )
+      )
+    ));
+
     // new JoystickButton(m_operatorGamepad, Button.kRB)
     // .onTrue(new PrintCommand("arm angle  " + String.format("%2.5", m_Arm.armRotation()))
     // .andThen(new PrintCommand("heading" + String.format("%2.5", m_robotDrive.getHeading().getDegrees()))));
@@ -180,14 +205,6 @@ public class RobotContainer {
     // JoystickButton hookButtonRT = new JoystickButton(m_driverGamepad, Button.kB.value); 
     // JoystickButton reverseTrigger = new JoystickButton(m_driverGamepad, Button.kRightBumper.value);
     
-    new JoystickButton(m_driverGamepad, Button.kRightBumper.value)
-      .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
-      .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
-
-    new JoystickButton(m_driverGamepad, Button.kLeftBumper.value)
-      .onTrue(new RunCommand(() -> m_Hook.voidHookRun(-1), m_Hook))
-      .onFalse(new InstantCommand( () -> m_Hook.voidHookRun(0), m_Hook));
-    
     // hookButtonLT.whileTrue(
     //   new ConditionalCommand(
     //     m_Hook.leftHookRunCommand(false),
@@ -201,26 +218,18 @@ public class RobotContainer {
     //     m_Hook.rightHookRunCommand(true),
     //     reverseTrigger
     // ));
+
+    // new JoystickButton(m_testingGampad, Button.kRT)
+    // .onTrue(m_Arm.getArmInGroundPostion())
+    // .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
+
+    // new JoystickButton(m_testingGampad, Button.kB)
+    // .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
+    // .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
     
-    // new JoystickButton(m_testingGampad, Button.kA)
-    // .onTrue(m_InOut.intakeCommand(0.4))
+    // new JoystickButton(m_testingGampad, Button.kR)
+    // .onTrue(m_InOut.intakeCommand(1))
     // .onFalse(m_InOut.stopIntake());
-
-    new JoystickButton(m_testingGampad, Button.kRightBumper.value)
-    .onTrue(m_Arm.getArmInGroundPostion())
-    .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
-
-
-    new JoystickButton(m_testingGampad, Button.kB.value)
-    .onTrue(new InstantCommand(
-      () -> m_robotDrive.resetOdometry(
-        new Pose2d(
-          new Random().nextDouble(16),
-          new Random().nextDouble(8.2),
-          new Rotation2d(new Random().nextDouble(360))
-        )
-      )
-    ));
   }
 
   private void configureAutonomousChooser() {
@@ -240,6 +249,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("SpinUpAndFeedNote", m_InOut.shootIntoSpeaker());
     NamedCommands.registerCommand("Speaker", m_Arm.armToSpeakerCommand());
     NamedCommands.registerCommand("FeedNote", m_InOut.intoShooter());
+    NamedCommands.registerCommand("AutoNomNom", m_Autos.toGroundAndAutoGrabCommand(m_Arm, m_InOut));
     NamedCommands.registerCommand("NomNomWhileShoot", m_Autos.intakeWhileShooting(m_InOut));
   }
   /**

@@ -153,7 +153,7 @@ public class ArmSubsystem extends SubsystemBase {
   public boolean armAngleInGroundRange()
   {
     // These need to be constant values that we can update
-    return MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(), 0.0005, 0, 1);
+    return MathUtil.isNear(ArmConstants.kGroundPosition, armRotation(), 0.005, 0, 1);
   }
 
   

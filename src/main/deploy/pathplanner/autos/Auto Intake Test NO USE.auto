@@ -2,23 +2,17 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7533104222834955,
-      "y": 6.7315067018511066
+      "x": 1.36086297850199,
+      "y": 5.515804013063089
     },
-    "rotation": -120.0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
               {
@@ -30,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "top 1.0"
+                  "pathName": "First note"
                 }
               }
             ]
@@ -39,7 +33,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "top 1.1"
+            "pathName": "test 1.1"
           }
         },
         {
@@ -53,48 +47,23 @@
           "data": {
             "commands": [
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 3.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "AutoNomNom"
-                      }
-                    }
-                  ]
+                  "name": "AutoNomNom"
                 }
               },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "top 2.0"
+                  "pathName": "test 2.1"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "top 2.1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpinUpAndFeedNote"
           }
         }
       ]
     }
   },
-  "folder": "Amp",
+  "folder": null,
   "choreoAuto": false
 }

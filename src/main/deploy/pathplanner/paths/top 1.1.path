@@ -32,23 +32,6 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Reverse",
-      "waypointRelativePos": 0.2,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "ReverseNomNom"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "Speaker",
       "waypointRelativePos": 0,
       "command": {
