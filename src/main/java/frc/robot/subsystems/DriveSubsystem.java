@@ -274,11 +274,11 @@ public class DriveSubsystem extends SubsystemBase {
     // m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
-  private void driveRobotRelative(ChassisSpeeds speeds) {
+  public void driveRobotRelative(ChassisSpeeds speeds) {
     drive(speeds, false);
   }
 
-  private void drive(ChassisSpeeds speeds, boolean fieldRelative) {
+  public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
     if (fieldRelative)
         speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getPose().getRotation()); //m_navx.getRotation2d()
     //speeds = ChassisSpeeds.discretize(speeds, LoggedRobot.defaultPeriodSecs);
