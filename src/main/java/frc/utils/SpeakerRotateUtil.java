@@ -6,6 +6,8 @@ package frc.utils;
 
 
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,15 +31,12 @@ public class SpeakerRotateUtil{
   public SpeakerRotateUtil(DriveSubsystem driveSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_drive = driveSubsystem;
-    robotX = m_drive.getPose().getX();
-    robotY = m_drive.getPose().getY();
-    targetX = 0;
     targetY = 5.55; //do not change
   }
 
   public boolean onRedSide() {
     return DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
-}
+  }
 
   // Function to calculate the angle between two points
   public static double calculateAngle(double currentX, double currentY, double targetX, double targetY) {
@@ -51,13 +50,11 @@ public class SpeakerRotateUtil{
     return angle;
   }
 
-  public double returnSpeakerAngle( boolean redside){
-    if (redside) {
-      targetX = 16.54;
-    } else {
-      targetX = 0.0;
-    }
-    SmartDashboard.getBoolean("redSide", redside);
+  public double returnSpeakerAngle(DoubleSupplier robotXSupplier, DoubleSupplier robotYSupplier){
+    double robotX = robotXSupplier.getAsDouble();
+    double robotY = robotYSupplier.getAsDouble();
+    targetX = 16.54;
+    // targetX = 0.0;
     SmartDashboard.putNumber("SpeakerAngle", calculateAngle(robotY, robotX, targetX, targetY));
     return calculateAngle(robotX, robotY, targetX, targetY);
   }

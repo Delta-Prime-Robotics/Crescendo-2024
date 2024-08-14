@@ -8,6 +8,7 @@ import java.text.BreakIterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -188,18 +191,47 @@ public class RobotContainer {
     .onTrue(m_Arm.getArmInGroundPostion())
     .onFalse(new InstantCommand(() -> m_Arm.armRun(0), m_Arm));
 
-    new JoystickButton(m_testingGampad, Button.kX)
-    .whileTrue(new TurnToAngleCommand(
-      m_RotateUtil
-        .returnSpeakerAngle(DriverStation.getAlliance().get() == DriverStation.Alliance.Red),
-      m_robotDrive));
+    // new JoystickButton(m_driverGamepad, Button.kX)
+    // .whileTrue(new TurnToAngleCommand(
+    //   m_RotateUtil
+    //     .returnSpeakerAngle(
+    //       () -> m_robotDrive.getPose().getX(),
+    //       () -> m_robotDrive.getPose().getY()
+    //       ),
+    //   m_robotDrive));
+    new JoystickButton(m_driverGamepad, Button.kX)
+    .whileTrue(new ParallelRaceGroup(
+        new RunCommand(() -> {
+            // Update suppliers for robotX and robotY
+            DoubleSupplier robotXSupplier = () -> m_robotDrive.getPose().getX();
+            DoubleSupplier robotYSupplier = () -> m_robotDrive.getPose().getY();
+            
+            // Calculate and update the angle
+            double angle = m_RotateUtil.returnSpeakerAngle(robotXSupplier, robotYSupplier);
+            SmartDashboard.putNumber("Calculated Angle", angle); // Optional: Display the angle for debugging
+        }, m_robotDrive),
+        
+        new TurnToAngleCommand(
+            m_RotateUtil.returnSpeakerAngle(
+                () -> m_robotDrive.getPose().getX(),
+                () -> m_robotDrive.getPose().getY()
+            ),
+            m_robotDrive
+        )
+    ));
+    // new JoystickButton(m_driverGamepad, Button.kX)
+    // .onTrue(new InstantCommand(
+    //   () -> m_RotateUtil.returnSpeakerAngle(
+    //   () -> 9,
+    //   () -> 3.5
+    //   )));
     // new JoystickButton(m_testingGampad, Button.kY)
     // .onTrue(new InstantCommand(()->m_robotDrive.resetOdometry(
     //   new Pose2d(new Translation2d(0,0), 
     //   new Rotation2d(m_RotateUtil.returnSpeakerAngle(m_robotDrive)))
     //   )));
 
-    new JoystickButton(m_testingGampad, Button.kB)
+    new JoystickButton(m_driverGamepad, Button.kB)
     .onTrue(new InstantCommand(
       () -> m_robotDrive.resetOdometry(
         new Pose2d(
