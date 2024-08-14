@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5,
-        "y": 5.589805823486292
+        "x": 2.824717546724679,
+        "y": 5.515804013063089
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.500000000000001,
-        "y": 5.589805823486292
+        "x": 1.8637864970185378,
+        "y": 5.515804013063089
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.918404239090931,
-        "y": 5.589805823486292
+        "x": 1.36086297850199,
+        "y": 5.515804013063089
       },
       "prevControl": {
-        "x": 1.9184042390909308,
-        "y": 5.589805823486292
+        "x": 2.118366924943442,
+        "y": 5.515804013063089
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +30,25 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "shoot",
+      "waypointRelativePos": 0,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Speaker"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -43,7 +61,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Testing",
   "previewStartingState": {
     "rotation": 180.0,
     "velocity": 0

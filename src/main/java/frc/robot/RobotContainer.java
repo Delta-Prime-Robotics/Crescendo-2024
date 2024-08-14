@@ -212,6 +212,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("SpinUpAndFeedNote", m_InOut.shootIntoSpeaker());
     NamedCommands.registerCommand("Speaker", m_Arm.armToSpeakerCommand());
     NamedCommands.registerCommand("FeedNote", m_InOut.intoShooter());
+    NamedCommands.registerCommand("AutoNomNom", m_Autos.toGroundAndAutoGrabCommand(m_Arm, m_InOut));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
