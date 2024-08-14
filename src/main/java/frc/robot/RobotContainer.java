@@ -41,6 +41,7 @@ import frc.robot.Constants.GamePad.LeftStick;
 import frc.robot.Constants.GamePad.RightStick;
 import frc.robot.commands.ArmManualMoveCommand;
 import frc.robot.commands.Autos;
+import frc.robot.commands.CalculateAndTurnCommand;
 import frc.robot.commands.IntakeJoystickCommand;
 import frc.robot.commands.TurnToAngleCommand;
 import frc.robot.Constants.OIConstants;
@@ -199,26 +200,28 @@ public class RobotContainer {
     //       () -> m_robotDrive.getPose().getY()
     //       ),
     //   m_robotDrive));
-    new JoystickButton(m_driverGamepad, Button.kX)
-    .whileTrue(new ParallelRaceGroup(
-        new RunCommand(() -> {
-            // Update suppliers for robotX and robotY
-            DoubleSupplier robotXSupplier = () -> m_robotDrive.getPose().getX();
-            DoubleSupplier robotYSupplier = () -> m_robotDrive.getPose().getY();
+    // new JoystickButton(m_driverGamepad, Button.kX)
+    // .whileTrue(new ParallelRaceGroup(
+    //     new RunCommand(() -> {
+    //         // Update suppliers for robotX and robotY
+    //         DoubleSupplier robotXSupplier = () -> m_robotDrive.getPose().getX();
+    //         DoubleSupplier robotYSupplier = () -> m_robotDrive.getPose().getY();
             
-            // Calculate and update the angle
-            double angle = m_RotateUtil.returnSpeakerAngle(robotXSupplier, robotYSupplier);
-            SmartDashboard.putNumber("Calculated Angle", angle); // Optional: Display the angle for debugging
-        }, m_robotDrive),
+    //         // Calculate and update the angle
+    //         double angle = m_RotateUtil.returnSpeakerAngle(robotXSupplier, robotYSupplier);
+    //         SmartDashboard.putNumber("Calculated Angle", angle); // Optional: Display the angle for debugging
+    //     }, m_robotDrive),
         
-        new TurnToAngleCommand(
-            m_RotateUtil.returnSpeakerAngle(
-                () -> m_robotDrive.getPose().getX(),
-                () -> m_robotDrive.getPose().getY()
-            ),
-            m_robotDrive
-        )
-    ));
+    //     new TurnToAngleCommand(
+    //         m_RotateUtil.returnSpeakerAngle(
+    //             () -> m_robotDrive.getPose().getX(),
+    //             () -> m_robotDrive.getPose().getY()
+    //         ),
+    //         m_robotDrive
+    //     )
+    // ));
+    new JoystickButton(m_driverGamepad, Button.kX)
+    .whileTrue(m_robotDrive.turnToAngleCommand(m_RotateUtil));
     // new JoystickButton(m_driverGamepad, Button.kX)
     // .onTrue(new InstantCommand(
     //   () -> m_RotateUtil.returnSpeakerAngle(

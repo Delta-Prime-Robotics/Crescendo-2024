@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -12,6 +13,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,7 +33,12 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.utils.SpeakerRotateUtil;
 import frc.utils.SwerveUtils;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -67,9 +74,10 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.kMagnitudeSlewRate);
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
-
   private final Field2d m_Field = new Field2d();
-
+  PIDController turningController = new PIDController(0.5, 0, 0);
+  DoubleSupplier robotXSupplier;
+  DoubleSupplier robotYSupplier;
   // Odometry class for tracking robot pose
   // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
   //     DriveConstants.kDriveKinematics,
@@ -125,6 +133,10 @@ public class DriveSubsystem extends SubsystemBase {
     
     //field
     SmartDashboard.putData("Field", m_Field);
+    turningController.enableContinuousInput(-1 * Math.PI, Math.PI);
+    // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
+    // setpoint before it is considered as having reached the reference
+    turningController.setTolerance(0.0349066, 0.1);
   }
 
   @Override
@@ -146,7 +158,8 @@ public class DriveSubsystem extends SubsystemBase {
     //robot postion on field
     m_Field.setRobotPose(getPose());
     SmartDashboard.putNumber("Get Heading", this.getHeading().getDegrees());
-
+    robotXSupplier = () -> getPose().getX();
+    robotYSupplier = () -> getPose().getY();
   }
 
   /**
@@ -375,6 +388,20 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_navx.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+  
+  public boolean isAtAngle() {
+    return turningController.atSetpoint();
+  }
+
+  public Command turnToAngleCommand(SpeakerRotateUtil rotateUtil) {
+    return 
+      new PIDCommand(
+      turningController,
+      () -> getPose().getRotation().getRadians(),
+      rotateUtil.returnSpeakerAngle(robotXSupplier, robotYSupplier),
+      output -> drive(0, 0, output, true, true),
+      this);
   }
 
 }
