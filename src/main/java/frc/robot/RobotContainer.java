@@ -81,8 +81,7 @@ public class RobotContainer {
     configureBindings();
 
     SmartDashboard.putData("PathPlaner Chooser", m_pathChooser);
-    SmartDashboard.putData("Simple Auto Chooser", m_AutoChooser);
-    SmartDashboard.putBoolean("Use Path", false);
+ 
   }
   /**
    * Use this method to define your button->command mappings. Buttons can be
