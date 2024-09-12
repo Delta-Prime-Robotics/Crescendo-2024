@@ -9,17 +9,13 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/PathPlaner Chooser": "String Chooser"
     }
   },
   "NetworkTables": {
     "Persistent Values": {
       "open": false
-    },
-    "transitory": {
-      "SmartDashboard": {
-        "open": true
-      }
     }
   },
   "NetworkTables Info": {

@@ -36,6 +36,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class InOut extends SubsystemBase {
  
   //Output Top & Bottom 
@@ -159,10 +160,9 @@ public class InOut extends SubsystemBase {
   }
   
   public Command intoShooter() {
-    return new InstantCommand(() -> m_intake.set(1))
-    .andThen(new WaitCommand(0.5))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)  
-    .andThen(new InstantCommand(() -> m_intake.set(0)))
-    .andThen(new InstantCommand(()-> setShooterRef(0)));
+    return this.runOnce(()->setIntakeSpeed(1))
+    .andThen(new WaitUntilCommand(()-> !IsNoteInIntake()))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)
+    .finallyDo(()->stopIntake());
   }
 
   public Command intakeCommand(double speed) {
