@@ -158,6 +158,23 @@ public class InOut extends SubsystemBase {
     return group; //I would update this but im lazy
     //I could make it lot better by not using wait commands
   }
+
+  private boolean isShooterAtSetpoint(){
+    if(shooterVelocity() > kSetpoint){
+      return true;
+    }
+    return false;
+  }
+
+  
+  public Command spinUpAndShoot(){
+    return this.run(() -> setShooterRef(kSetpoint))
+    .until(()->isShooterAtSetpoint())
+    .andThen(intoShooter())
+    .finallyDo(()-> setShooterRef(0));
+    //I would update this but im lazy
+    //I could make it lot better by not using wait commands
+  }
   
   public Command intoShooter() {
     return this.runOnce(()->setIntakeSpeed(1))
