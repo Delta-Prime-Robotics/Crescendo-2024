@@ -70,6 +70,7 @@ public class HookSubsystem extends SubsystemBase {
       // ()-> System.out.println("left stop")        
     );
   }
+  
   /**
    * @param direction true = forwards false = backwards
    * @return runs right Hook
@@ -100,8 +101,8 @@ public class HookSubsystem extends SubsystemBase {
   
 
   
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+  // @Override
+  // public void periodic() {
+  //   // This method will be called once per scheduler run
+  // }
 }

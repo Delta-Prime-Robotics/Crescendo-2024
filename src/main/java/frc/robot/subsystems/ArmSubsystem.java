@@ -166,9 +166,9 @@ public class ArmSubsystem extends SubsystemBase {
 //    return this.run(()-> setRef(ArmConstants.kSpeakerPosition));
 //  }
   
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Arm Pos AbsoluteEncoder",  armRotation());
-    // This method will be called once per scheduler run
-  }
+  // @Override
+  // public void periodic() {
+  //   SmartDashboard.putNumber("Arm Pos AbsoluteEncoder",  armRotation());
+  //   // This method will be called once per scheduler run
+  // }
 }
