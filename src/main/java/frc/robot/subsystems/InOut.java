@@ -154,7 +154,7 @@ public class InOut extends SubsystemBase {
   }
   
   private static double shooterVelocity() {
-    return -m_Encoder.getVelocity(); 
+    return m_Encoder.getVelocity(); 
     //NO TOUCHY
   }
 
@@ -174,13 +174,15 @@ public class InOut extends SubsystemBase {
   }
 
   private boolean isShooterAtSetpoint(){
-    if(shooterVelocity() > InOutConstants.kSetpoint){
+    //the actual Velocity of the Shoot is 4000rpms~ 
+    //the set point is 200rpms less then the real life rpms~
+    if(shooterVelocity() > InOutConstants.kSetpoint + 150){
       return true;
     }
+
     return false;
   }
 
-  
   public Command spinUpAndShoot(){
     return this.run(() -> setShooterRef(InOutConstants.kSetpoint))
     .until(()->isShooterAtSetpoint())
@@ -251,7 +253,7 @@ public class InOut extends SubsystemBase {
     // boolean noteState = SmartDashboard.getBoolean("IsNoteInIntake", false);
     // if((noteState != IsNoteInIntake)) { noteState = IsNoteInIntake;}
     SmartDashboard.putBoolean("IsNoteInIntake", IsNoteInIntake());
-    SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
+    SmartDashboard.putNumber("shooter volocity", shooterVelocity());
     SmartDashboard.putNumber("mm distance", distanceSensor());
   }
   
