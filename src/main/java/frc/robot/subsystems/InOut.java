@@ -51,12 +51,8 @@ public class InOut extends SubsystemBase {
   private static double kP = 0.0001;
   private static double kI = 0;
   private static double kD = 0;
-  public static final double kSetpoint = 3800;
-  private static final double kMinOutput = -1;
-  private static final double kMaxOutput = 1;
-  private static final double kMaxRPM = 4800;
   public static DigitalInput m_LimitSwitch = new DigitalInput(0);
-  public static LaserCan lc = new LaserCan(24);
+  public static LaserCan lc = new LaserCan(InOutConstants.kLaserCanCanID);
   //intake
   private final CANSparkMax m_intake;
   public SparkLimitSwitch m_bbLimitSwitch;
@@ -88,7 +84,10 @@ public class InOut extends SubsystemBase {
     this.shooterPIDController.setP(kP);
     this.shooterPIDController.setI(kI);
     this.shooterPIDController.setD(kD);
-    this.shooterPIDController.setOutputRange(kMinOutput, kMaxOutput);
+    this.shooterPIDController.setOutputRange(
+      InOutConstants.kMinOutput, 
+      InOutConstants.kMaxOutput
+    );
     // SmartDashboard.putNumber("P Gain", kP);
     // SmartDashboard.putNumber("I Gain", kI);
     // SmartDashboard.putNumber("D Gain", kD);
@@ -148,8 +147,9 @@ public class InOut extends SubsystemBase {
     //NO TOUCHY
   }
 
+  //Does this need to be a this.run? A this.runOnce should work
   public Command spinUpShooter() {
-    return this.run(() -> setShooterRef(kSetpoint))
+    return this.run(() -> setShooterRef(InOutConstants.kSetpoint))
     .finallyDo(()-> setShooterRef(0));
   }
   
@@ -160,7 +160,7 @@ public class InOut extends SubsystemBase {
 
   
   public Command shootIntoSpeaker(){
-    final double kspeed = kSetpoint; //Speed is in RPMs
+    final double kspeed = InOutConstants.kSetpoint; //Speed is in RPMs
     
     SequentialCommandGroup group = new SequentialCommandGroup(
       new ParallelDeadlineGroup(
@@ -174,7 +174,7 @@ public class InOut extends SubsystemBase {
   }
 
   private boolean isShooterAtSetpoint(){
-    if(shooterVelocity() > kSetpoint){
+    if(shooterVelocity() > InOutConstants.kSetpoint){
       return true;
     }
     return false;
@@ -182,7 +182,7 @@ public class InOut extends SubsystemBase {
 
   
   public Command spinUpAndShoot(){
-    return this.run(() -> setShooterRef(kSetpoint))
+    return this.run(() -> setShooterRef(InOutConstants.kSetpoint))
     .until(()->isShooterAtSetpoint())
     .andThen(intoShooter())
     .finallyDo(()-> setShooterRef(0));

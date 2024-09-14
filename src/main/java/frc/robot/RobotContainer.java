@@ -36,6 +36,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import frc.robot.commands.ArmManualMoveCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.IntakeJoystickCommand;
+import frc.robot.Constants.InOutConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -141,8 +142,9 @@ public class RobotContainer {
     // new JoystickButton(m_operatorGamepad, XboxController.Button.kX.value)
     // .onTrue(m_InOut.intoShooter());
 
+    //Use .whileTrue m_InOutspinUpShooter();
     new JoystickButton(m_operatorGamepad, Button.kB.value)
-    .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOut.kSetpoint)))
+    .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOutConstants.kSetpoint)))
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
 
     new JoystickButton(m_operatorGamepad, Button.kRightBumper.value)
