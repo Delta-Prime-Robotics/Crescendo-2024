@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import au.grapplerobotics.LaserCan;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
@@ -30,11 +31,13 @@ import frc.robot.Constants;
 import frc.robot.Constants.InOutConstants;
 import frc.robot.Constants.NeoMotorConstants;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class InOut extends SubsystemBase {
@@ -99,7 +102,7 @@ public class InOut extends SubsystemBase {
 
     m_bbLimitSwitch = m_intake.getForwardLimitSwitch(SparkLimitSwitch.Type.kNormallyOpen);
     m_bbLimitSwitch.enableLimitSwitch(false);
-   
+
   }
 
   // public boolean IsNoteInIntake() {
@@ -115,12 +118,23 @@ public class InOut extends SubsystemBase {
 
   public double distanceSensor(){
     LaserCan.Measurement measurement = lc.getMeasurement();
-    if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
-      return measurement.distance_mm;
-    } else {
-      DataLogManager.log("Oh no! The target is out of range, or we can't get a reliable measurement!");
-      // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurement.
-      return measurement.distance_mm;
+
+    if(measurement != null){
+      if (measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) {
+        
+        return measurement.distance_mm;
+      } 
+      else {
+        DataLogManager.log("Oh no! The target is out of range, or we can't get a reliable measurement:" + measurement.status);
+      
+        // You can still use distance_mm in here, if you're ok tolerating a clamped value or an unreliable measurement.
+        return measurement.distance_mm;
+      }
+    }
+    else{
+      DataLogManager.log("Error Could Not Read LaserCan: NullPointerException");
+      // DriverStation.reportError("Error Could Not Read LaserCan: NullPointerException" , true );
+      return 0;
     }
   }
   
@@ -179,7 +193,8 @@ public class InOut extends SubsystemBase {
   public Command intoShooter() {
     return this.runOnce(()->setIntakeSpeed(1))
     .andThen(new WaitUntilCommand(()-> !IsNoteInIntake()))// or use WaitCommand(IsNotOutOfIntake).withTimeout(1.5)
-    .finallyDo(()->stopIntake());
+    .finallyDo(()->stopIntake())
+    .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf);
   }
 
   public Command intakeCommand(double speed) {
@@ -239,5 +254,5 @@ public class InOut extends SubsystemBase {
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
     SmartDashboard.putNumber("mm distance", distanceSensor());
   }
-  
+
 }
