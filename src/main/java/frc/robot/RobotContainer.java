@@ -153,6 +153,9 @@ public class RobotContainer {
     .onTrue(m_InOut.autoIntakeCommand())
     .onFalse(m_InOut.stopIntake());
 
+    new JoystickButton(m_operatorGamepad, Button.kX.value)
+    .whileTrue(m_InOut.intoShooter());
+
     new JoystickButton(m_driverGamepad, Button.kRightBumper.value)
     .onTrue(new RunCommand(() -> m_Hook.voidHookRun(1), m_Hook))
     .onFalse(new InstantCommand(() -> m_Hook.voidHookRun(0), m_Hook));
@@ -221,8 +224,7 @@ public class RobotContainer {
     // new JoystickButton(m_testingGampad, Button.kRT)
     // .onTrue(m_Arm.getArmInGroundPostion())
     // .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
-    new JoystickButton(m_operatorGamepad, Button.kX.value)
-    .onTrue(m_InOut.intoShooter());
+
     // new JoystickButton(m_testingGampad, Button.kB)
     // .onTrue(m_Autos.speakerAndSpinUp(m_Arm, m_InOut))
     // .onFalse(new InstantCommand( () -> m_Arm.armRun(0), m_Arm));
