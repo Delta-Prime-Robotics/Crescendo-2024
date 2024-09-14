@@ -254,5 +254,15 @@ public class InOut extends SubsystemBase {
     SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
     SmartDashboard.putNumber("mm distance", distanceSensor());
   }
+  
+  public void simulationInit(){
+    REVPhysicsSim.getInstance().addSparkMax(m_intake, DCMotor.getNeo550(1).withReduction(5));
+    REVPhysicsSim.getInstance().addSparkMax(m_LeaderShooter, DCMotor.getNEO(1));
+  }
 
+  public void simulationPeriodic(){
+    REVPhysicsSim.getInstance().run();    
+    SmartDashboard.putNumber("Intake Motor speed", m_intake.get());
+  }
+  
 }
