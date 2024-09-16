@@ -132,7 +132,7 @@ public class InOut extends SubsystemBase {
       }
     }
     else{
-      DataLogManager.log("Error Could Not Read LaserCan: NullPointerException");
+      // DataLogManager.log("Error Could Not Read LaserCan: NullPointerException");
       // DriverStation.reportError("Error Could Not Read LaserCan: NullPointerException" , true );
       return 0;
     }
