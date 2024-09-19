@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.Map;
 import java.util.Optional;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -21,11 +22,15 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -69,6 +74,9 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
   private final Field2d m_Field = new Field2d();
+
+  public static double weightedSpeedMetersPerSecond;
+  public static double weightedAngularSpeed;
 
   // Odometry class for tracking robot pose
   // SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -125,6 +133,8 @@ public class DriveSubsystem extends SubsystemBase {
     
     //field
     SmartDashboard.putData("Field", m_Field);
+    SmartDashboard.putNumber("Angular Speed", 1);
+    SmartDashboard.putNumber("Max Speed", 1);
   }
 
   @Override
@@ -146,7 +156,13 @@ public class DriveSubsystem extends SubsystemBase {
     //robot postion on field
     m_Field.setRobotPose(getPose());
     SmartDashboard.putNumber("Get Heading", this.getHeading().getDegrees());
-
+    setAngularSpeed(SmartDashboard.getNumber("Angular Speed", 1));
+    setMaxSpeed(SmartDashboard.getNumber("Max Speed", 1));
+    // GenericEntry angularSpeed = Shuffleboard.getTab("SmartDashboard")
+    //   .add("Angular Speed", 1)
+    //   .withWidget("Number Slider")
+    //   .withProperties(Map.of("Min", 0, "Max", 1))
+    //   .getEntry();
   }
 
   /**
@@ -246,9 +262,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     // Convert the commanded speeds into the correct units for the drivetrain
-    double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-    double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
+    double xSpeedDelivered = xSpeedCommanded * weightedSpeedMetersPerSecond;
+    double ySpeedDelivered = ySpeedCommanded * weightedSpeedMetersPerSecond;
+    double rotDelivered = m_currentRotation * weightedAngularSpeed;
     
     Optional<Alliance> ally = DriverStation.getAlliance();
       if (ally.isPresent() && ally.get() == Alliance.Red) {
@@ -370,6 +386,14 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return m_navx.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  public void setMaxSpeed(double weight){
+    weightedSpeedMetersPerSecond = DriveConstants.kMaxSpeedMetersPerSecond * weight;
+  }
+
+  public void setAngularSpeed(double weight){
+    weightedAngularSpeed = DriveConstants.kMaxAngularSpeed * weight;
   }
 
 }

@@ -16,6 +16,9 @@
   "NetworkTables": {
     "Persistent Values": {
       "open": false
+    },
+    "Retained Values": {
+      "open": false
     }
   },
   "NetworkTables Info": {
@@ -26,6 +29,18 @@
       "open": true
     },
     "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    },
+    "shuffleboard@1": {
+      "Publishers": {
+        "open": true
+      },
+      "Subscribers": {
+        "open": true
+      },
       "open": true
     },
     "visible": true
