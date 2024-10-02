@@ -255,6 +255,7 @@ public class InOut extends SubsystemBase {
     SmartDashboard.putBoolean("IsNoteInIntake", IsNoteInIntake());
     SmartDashboard.putNumber("shooter volocity", shooterVelocity());
     SmartDashboard.putNumber("mm distance", distanceSensor());
+    SmartDashboard.putBoolean("shooter at setpoint", isShooterAtSetpoint());
   }
   
   public void simulationInit(){

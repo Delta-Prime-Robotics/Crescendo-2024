@@ -135,17 +135,12 @@ public class RobotContainer {
       .onTrue(new InstantCommand(
         () -> m_robotDrive.zeroHeading(),
         m_robotDrive));
-
-    // new JoystickButton(m_operatorGamepad, Button.kLT)
-    // .onTrue(m_InOut.shootIntoSpeaker());
     
-    // new JoystickButton(m_operatorGamepad, XboxController.Button.kX.value)
-    // .onTrue(m_InOut.intoShooter());
-
-    //Use .whileTrue m_InOutspinUpShooter();
     new JoystickButton(m_operatorGamepad, Button.kB.value)
-    .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOutConstants.kSetpoint)))
-    .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
+    .whileTrue(m_InOut.spinUpAndShoot());
+
+    // new JoystickButton(m_operatorGamepad, Button.kB.value)
+    // .whileTrue(m_InOut.spinUpShooter());
 
     new JoystickButton(m_operatorGamepad, Button.kRightBumper.value)
     .onTrue(new RunCommand(() -> m_Arm.getArmInPositionSpeaker(), m_Arm))
