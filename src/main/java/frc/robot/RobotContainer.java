@@ -36,6 +36,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import frc.robot.commands.ArmManualMoveCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.IntakeJoystickCommand;
+import frc.robot.Constants.InOutConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -77,7 +78,7 @@ public class RobotContainer {
     m_pathChooser = AutoBuilder.buildAutoChooser();
     
     // Configure the button bindings
-    configureAutonomousChooser();
+    // configureAutonomousChooser();
     configureBindings();
 
     SmartDashboard.putData("PathPlaner Chooser", m_pathChooser);
@@ -141,8 +142,9 @@ public class RobotContainer {
     // new JoystickButton(m_operatorGamepad, XboxController.Button.kX.value)
     // .onTrue(m_InOut.intoShooter());
 
+    //Use .whileTrue m_InOutspinUpShooter();
     new JoystickButton(m_operatorGamepad, Button.kB.value)
-    .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOut.kSetpoint)))
+    .onTrue(new InstantCommand(() -> m_InOut.setShooterRef(InOutConstants.kSetpoint)))
     .onFalse(new InstantCommand(()-> m_InOut.setShooterRef(0)));
 
     new JoystickButton(m_operatorGamepad, Button.kRightBumper.value)
@@ -234,13 +236,13 @@ public class RobotContainer {
     // .onFalse(m_InOut.stopIntake());
   }
 
-  private void configureAutonomousChooser() {
-    m_AutoChooser.setDefaultOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
-    m_AutoChooser.addOption("shoot and back", m_Autos.shootAndMoveCommand(m_Arm, m_InOut, m_robotDrive));
-    m_AutoChooser.addOption("Do Nothing", m_Autos.doNothing());
-    // m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
-    // m_AutoChooser.addOption("Shoot Then Backup While Intaking", getAutonomousCommand());
-  }
+  // private void configureAutonomousChooser() {
+  //   m_AutoChooser.setDefaultOption("Just Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));
+  //   m_AutoChooser.addOption("shoot and back", m_Autos.shootAndMoveCommand(m_Arm, m_InOut, m_robotDrive));
+  //   m_AutoChooser.addOption("Do Nothing", m_Autos.doNothing());
+  //   // m_AutoChooser.addOption("Back up", m_Autos.justBackUpCommand(m_robotDrive));
+  //   // m_AutoChooser.addOption("Shoot Then Backup While Intaking", getAutonomousCommand());
+  // }
 
   private void configurePathPlanerChooser(){
     NamedCommands.registerCommand("Shoot", m_Autos.justShootCommand(m_Arm, m_InOut));

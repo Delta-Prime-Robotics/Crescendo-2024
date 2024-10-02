@@ -51,12 +51,8 @@ public class InOut extends SubsystemBase {
   private static double kP = 0.0001;
   private static double kI = 0;
   private static double kD = 0;
-  public static final double kSetpoint = 3800;
-  private static final double kMinOutput = -1;
-  private static final double kMaxOutput = 1;
-  private static final double kMaxRPM = 4800;
   public static DigitalInput m_LimitSwitch = new DigitalInput(0);
-  public static LaserCan lc = new LaserCan(24);
+  public static LaserCan lc = new LaserCan(InOutConstants.kLaserCanCanID);
   //intake
   private final CANSparkMax m_intake;
   public SparkLimitSwitch m_bbLimitSwitch;
@@ -88,7 +84,10 @@ public class InOut extends SubsystemBase {
     this.shooterPIDController.setP(kP);
     this.shooterPIDController.setI(kI);
     this.shooterPIDController.setD(kD);
-    this.shooterPIDController.setOutputRange(kMinOutput, kMaxOutput);
+    this.shooterPIDController.setOutputRange(
+      InOutConstants.kMinOutput, 
+      InOutConstants.kMaxOutput
+    );
     // SmartDashboard.putNumber("P Gain", kP);
     // SmartDashboard.putNumber("I Gain", kI);
     // SmartDashboard.putNumber("D Gain", kD);
@@ -148,19 +147,20 @@ public class InOut extends SubsystemBase {
     //NO TOUCHY
   }
 
+  //Does this need to be a this.run? A this.runOnce should work
   public Command spinUpShooter() {
-    return this.run(() -> setShooterRef(kSetpoint))
+    return this.run(() -> setShooterRef(InOutConstants.kSetpoint))
     .finallyDo(()-> setShooterRef(0));
   }
   
   private static double shooterVelocity() {
-    return -m_Encoder.getVelocity(); 
+    return m_Encoder.getVelocity(); 
     //NO TOUCHY
   }
 
   
   public Command shootIntoSpeaker(){
-    final double kspeed = kSetpoint; //Speed is in RPMs
+    final double kspeed = InOutConstants.kSetpoint; //Speed is in RPMs
     
     SequentialCommandGroup group = new SequentialCommandGroup(
       new ParallelDeadlineGroup(
@@ -170,6 +170,25 @@ public class InOut extends SubsystemBase {
       intoShooter(),
       new InstantCommand(() -> setShooterRef(0)));
     return group; //I would update this but im lazy
+    //I could make it lot better by not using wait commands
+  }
+
+  private boolean isShooterAtSetpoint(){
+    //the actual Velocity of the Shoot is 4000rpms~ 
+    //the set point is 200rpms less then the real life rpms~
+    if(shooterVelocity() > InOutConstants.kSetpoint + 150){
+      return true;
+    }
+
+    return false;
+  }
+
+  public Command spinUpAndShoot(){
+    return this.run(() -> setShooterRef(InOutConstants.kSetpoint))
+    .until(()->isShooterAtSetpoint())
+    .andThen(intoShooter())
+    .finallyDo(()-> setShooterRef(0));
+    //I would update this but im lazy
     //I could make it lot better by not using wait commands
   }
   
@@ -234,8 +253,18 @@ public class InOut extends SubsystemBase {
     // boolean noteState = SmartDashboard.getBoolean("IsNoteInIntake", false);
     // if((noteState != IsNoteInIntake)) { noteState = IsNoteInIntake;}
     SmartDashboard.putBoolean("IsNoteInIntake", IsNoteInIntake());
-    SmartDashboard.putNumber("shooter volocity", -shooterVelocity());
+    SmartDashboard.putNumber("shooter volocity", shooterVelocity());
     SmartDashboard.putNumber("mm distance", distanceSensor());
   }
+  
+  public void simulationInit(){
+    REVPhysicsSim.getInstance().addSparkMax(m_intake, DCMotor.getNeo550(1).withReduction(5));
+    REVPhysicsSim.getInstance().addSparkMax(m_LeaderShooter, DCMotor.getNEO(1));
+  }
 
+  public void simulationPeriodic(){
+    REVPhysicsSim.getInstance().run();    
+    SmartDashboard.putNumber("Intake Motor speed", m_intake.get());
+  }
+  
 }
