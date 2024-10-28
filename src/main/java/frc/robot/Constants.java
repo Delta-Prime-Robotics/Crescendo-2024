@@ -152,11 +152,17 @@ public final class Constants {
     public static final int kIntakeCanId = 5;
     public static final int kBottomOutputCanId = 6;
     public static final int kTopOutputCanId = 7;
+    public static final int kLaserCanCanID = 24;
     //Beam Break DIO
     public static final int kBeamBreakDIO = 0;
     // Idle modes
     public static final IdleMode kShooterIdleMode = IdleMode.kCoast;
     public static final IdleMode kIntakeIdleMode = IdleMode.kBrake;
+    //miss.
+    public static final double kSetpoint = 3800;
+    public static final double kMinOutput = -1;
+    public static final double kMaxOutput = 1;
+    public static final double kMaxRPM = 4800;
   }
 
   public final class HookConstants {
